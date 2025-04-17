@@ -7,6 +7,12 @@ import {
 } from "@/components/ui/sheet";
 import Link from "next/link";
 
+const HOVER_STYLES = {
+  default: "hover:bg-black hover:text-white",
+  signin: "hover:bg-amber-400",
+  signup: "bg-black text-white hover:bg-amber-400 hover:text-black",
+};
+
 interface NavbarItem {
   href: string;
   children: React.ReactNode;
@@ -59,20 +65,17 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
             <NavLink
               key={item.href}
               href={item.href}
-              className="hover:bg-black hover:text-white"
+              className={HOVER_STYLES.default}
             >
               {item.children}
             </NavLink>
           ))}
 
           <div className="border-t">
-            <NavLink href="/sign-in" className="hover:bg-amber-400">
+            <NavLink href="/sign-in" className={HOVER_STYLES.signin}>
               Log in
             </NavLink>
-            <NavLink
-              href="/sign-up"
-              className="bg-black text-white hover:bg-amber-400 hover:text-black"
-            >
+            <NavLink href="/sign-up" className={HOVER_STYLES.signup}>
               Start selling
             </NavLink>
           </div>

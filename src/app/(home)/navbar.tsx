@@ -98,10 +98,23 @@ export const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex">
-        <Button asChild variant="secondary" className={buttonStyles.signin}>
+        <Button
+          asChild
+          variant="secondary"
+          className={cn(
+            buttonStyles.signin,
+            "focus:ring-2 focus:ring-amber-400 focus:outline-none",
+          )}
+        >
           <Link href="/sign-in">Log in</Link>
         </Button>
-        <Button asChild className={buttonStyles.signup}>
+        <Button
+          asChild
+          className={cn(
+            buttonStyles.signup,
+            "focus:ring-2 focus:ring-amber-400 focus:outline-none",
+          )}
+        >
           <Link href="/sign-up">Start selling</Link>
         </Button>
       </div>
