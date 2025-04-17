@@ -108,12 +108,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                              runtime & pkg manager : bun.js
-2.                                                                                                                                              npm i === bun add - npx === bunx
-3.                                                                                                                                              nextjs 15.3.0 project setup
-4.                                                                                                                                              typescript ^5
-5.                                                                                                                                              tailwindcss ^4
-6.                                                                                                                                              shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                   runtime & pkg manager : bun.js
+2.                                                                                                                                                   npm i === bun add - npx === bunx
+3.                                                                                                                                                   nextjs 15.3.0 project setup
+4.                                                                                                                                                   typescript ^5
+5.                                                                                                                                                   tailwindcss ^4
+6.                                                                                                                                                   shadcnui 2.4.1 & --all ui components
 
 ## 02 customizations
 
@@ -130,6 +130,8 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 - route group for home layout
 
-  - navbar
-  - mobile navbar
-  - footer
+- foundational home layout that includes a navbar, main content area, and footer
+- few new Pages
+- navbar
+- mobile navbar
+- footer

@@ -26,6 +26,7 @@ const NavbarItem = ({ href, isActive, children }: NavbarItemProps) => {
     <Button
       asChild
       variant="outline"
+      aria-current={isActive ? "page" : undefined}
       className={cn(
         "hover:border-primary rounded-full border-transparent bg-transparent px-3.5 text-lg hover:bg-transparent",
         isActive && "bg-black text-white hover:bg-black hover:text-white",
@@ -59,6 +60,13 @@ const navbarItems = [
   },
 ];
 
+const buttonStyles = {
+  signin:
+    "h-full rounded-none border-y-0 border-r-0 bg-white px-12 text-lg transition-colors hover:bg-amber-400",
+  signup:
+    "h-full rounded-none border-y-0 border-r-0 bg-black px-12 text-lg text-white transition-colors hover:bg-amber-400 hover:text-black",
+};
+
 export const Navbar = () => {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -90,17 +98,10 @@ export const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex">
-        <Button
-          asChild
-          variant="secondary"
-          className="h-full rounded-none border-y-0 border-r-0 bg-white px-12 text-lg transition-colors hover:bg-amber-400"
-        >
+        <Button asChild variant="secondary" className={buttonStyles.signin}>
           <Link href="/sign-in">Log in</Link>
         </Button>
-        <Button
-          asChild
-          className="h-full rounded-none border-y-0 border-r-0 bg-black px-12 text-lg text-white transition-colors hover:bg-amber-400 hover:text-black"
-        >
+        <Button asChild className={buttonStyles.signup}>
           <Link href="/sign-up">Start selling</Link>
         </Button>
       </div>
@@ -110,6 +111,8 @@ export const Navbar = () => {
           variant="ghost"
           className="size-12 border-transparent bg-white"
           onClick={() => setIsSidebarOpen(true)}
+          aria-label="Open navigation menu"
+          aria-expanded={isSidebarOpen}
         >
           <MenuIcon />
         </Button>

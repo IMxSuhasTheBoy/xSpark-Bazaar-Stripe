@@ -6,9 +6,9 @@ interface Props {
 }
 const Layout = ({ children }: Props) => {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#F4F4F0]">
       <Navbar />
-      <div className="flex-1 bg-[#F4F4F0]">{children}</div>
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );

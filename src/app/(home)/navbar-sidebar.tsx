@@ -19,6 +19,34 @@ interface Props {
 }
 
 export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
+  const handleLinkClick = () => onOpenChange(false);
+
+  const NavLink = ({
+    href,
+    className,
+    children,
+  }: {
+    href: string;
+    className?: string;
+    children: React.ReactNode;
+  }) => (
+    <Link
+      href={href}
+      onClick={handleLinkClick}
+      className={`flex w-full items-center p-4 text-left text-base font-medium ${className}`}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpenChange(false);
+        }
+      }}
+      role="menuitem"
+      tabIndex={0}
+    >
+      {children}
+    </Link>
+  );
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="p-0 transition-none">
@@ -28,37 +56,25 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
 
         <ScrollArea className="flex h-full flex-col overflow-y-auto pb-2">
           {items.map((item) => (
-            <Link
-              href={item.href}
+            <NavLink
               key={item.href}
-              onClick={() => {
-                onOpenChange(false);
-              }}
-              className="flex w-full items-center p-4 text-left text-base font-medium hover:bg-black hover:text-white"
+              href={item.href}
+              className="hover:bg-black hover:text-white"
             >
               {item.children}
-            </Link>
+            </NavLink>
           ))}
 
           <div className="border-t">
-            <Link
-              href="/sign-in"
-              onClick={() => {
-                onOpenChange(false);
-              }}
-              className="flex w-full items-center p-4 text-left text-base font-medium hover:bg-amber-400"
-            >
+            <NavLink href="/sign-in" className="hover:bg-amber-400">
               Log in
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
               href="/sign-up"
-              onClick={() => {
-                onOpenChange(false);
-              }}
-              className="flex w-full items-center bg-black p-4 text-left text-base font-medium text-white hover:bg-amber-400 hover:text-black"
+              className="bg-black text-white hover:bg-amber-400 hover:text-black"
             >
               Start selling
-            </Link>
+            </NavLink>
           </div>
         </ScrollArea>
       </SheetContent>
