@@ -106,14 +106,14 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
     Market positioning
     Competitive differentiation
 
-## 01 Getting started Env setup
+## 01 getting started env setup
 
-1.                                                                                                                                           runtime & pkg manager : bun.js
-2.                                                                                                                                           npm i === bun add - npx === bunx
-3.                                                                                                                                           nextjs 15.3.0 project setup
-4.                                                                                                                                           typescript ^5
-5.                                                                                                                                           tailwindcss ^4
-6.                                                                                                                                           shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                   runtime & pkg manager : bun.js
+2.                                                                                                                                                   npm i === bun add - npx === bunx
+3.                                                                                                                                                   nextjs 15.3.0 project setup
+4.                                                                                                                                                   typescript ^5
+5.                                                                                                                                                   tailwindcss ^4
+6.                                                                                                                                                   shadcnui 2.4.1 & --all ui components
 
 ## 02 customizations
 
@@ -126,12 +126,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
   - modified radious, borders, etc.
 
-## Auth
+## 03 home layout
 
-- **strategy**
+- route group for home layout
 
-  -
-  -
-  -
-  -
-  -
+- foundational home layout that includes a navbar, main content area, and footer
+- few new Pages
+- navbar
+- mobile navbar
+- footer
