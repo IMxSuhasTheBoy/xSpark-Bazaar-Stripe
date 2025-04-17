@@ -108,14 +108,23 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 Getting started Env setup
 
-1.                                                                                                                                        runtime & pkg manager : bun.js
-2.                                                                                                                                        npm i === bun add - npx === bunx
-3.                                                                                                                                        nextjs 15.3.0 project setup
-4.                                                                                                                                        typescript ^5
-5.                                                                                                                                        tailwindcss ^4
-6.                                                                                                                                        shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                           runtime & pkg manager : bun.js
+2.                                                                                                                                           npm i === bun add - npx === bunx
+3.                                                                                                                                           nextjs 15.3.0 project setup
+4.                                                                                                                                           typescript ^5
+5.                                                                                                                                           tailwindcss ^4
+6.                                                                                                                                           shadcnui 2.4.1 & --all ui components
 
-## 02 Routes, Layout, Components
+## 02 customizations
+
+- modify look & feel
+
+  - added DMsans font
+  - neobrutalism style
+
+- modify globals.css
+
+  - modified radious, borders, etc.
 
 ## Auth
 
