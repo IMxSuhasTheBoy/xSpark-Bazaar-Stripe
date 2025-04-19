@@ -1,45 +1,60 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
+import Link from "next/link";
+
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const HOVER_STYLES = {
-  default: "hover:bg-black hover:text-white",
+  default: "hover:border-primary hover:bg-accent",
   signin: "hover:bg-amber-400",
   signup: "bg-black text-white hover:bg-amber-400 hover:text-black",
 };
 
 interface NavbarItem {
   href: string;
+  isActive?: boolean;
   children: React.ReactNode;
 }
 
 interface Props {
   items: NavbarItem[];
   open: boolean;
+  pathname: string;
   onOpenChange: (open: boolean) => void;
 }
 
-export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
+export const NavbarSidebar = ({
+  items,
+  open,
+  pathname,
+  onOpenChange,
+}: Props) => {
   const handleLinkClick = () => onOpenChange(false);
 
   const NavLink = ({
     href,
+    isActive,
     className,
     children,
   }: {
     href: string;
+    isActive?: boolean;
     className?: string;
     children: React.ReactNode;
   }) => (
     <Link
       href={href}
       onClick={handleLinkClick}
-      className={`flex w-full items-center p-4 text-left text-base font-medium ${className}`}
+      className={cn(
+        "flex w-full items-center border-y border-transparent p-4 text-left text-base font-medium",
+        className,
+        isActive && "bg-black text-white hover:bg-black",
+      )}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -65,6 +80,7 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
             <NavLink
               key={item.href}
               href={item.href}
+              isActive={item.href === pathname}
               className={HOVER_STYLES.default}
             >
               {item.children}

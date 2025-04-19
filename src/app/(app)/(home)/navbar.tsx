@@ -81,6 +81,7 @@ export const Navbar = () => {
 
       <NavbarSidebar
         items={navbarItems}
+        pathname={pathname}
         open={isSidebarOpen}
         onOpenChange={setIsSidebarOpen}
       />
@@ -98,23 +99,10 @@ export const Navbar = () => {
       </div>
 
       <div className="hidden lg:flex">
-        <Button
-          asChild
-          variant="secondary"
-          className={cn(
-            buttonStyles.signin,
-            "focus:ring-2 focus:ring-amber-400 focus:outline-none",
-          )}
-        >
+        <Button asChild variant="secondary" className={cn(buttonStyles.signin)}>
           <Link href="/sign-in">Log in</Link>
         </Button>
-        <Button
-          asChild
-          className={cn(
-            buttonStyles.signup,
-            "focus:ring-2 focus:ring-amber-400 focus:outline-none",
-          )}
-        >
+        <Button asChild className={cn(buttonStyles.signup)}>
           <Link href="/sign-up">Start selling</Link>
         </Button>
       </div>
@@ -122,7 +110,8 @@ export const Navbar = () => {
       <div className="flex items-center justify-center lg:hidden">
         <Button
           variant="ghost"
-          className="size-12 border-transparent bg-white"
+          size="lg"
+          className="border-transparent bg-white"
           onClick={() => setIsSidebarOpen(true)}
           aria-label="Open navigation menu"
           aria-expanded={isSidebarOpen}
