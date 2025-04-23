@@ -110,12 +110,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                             runtime & pkg manager : bun.js
-2.                                                                                                                                                             npm i === bun add - npx === bunx
-3.                                                                                                                                                             nextjs 15.3.0 project setup
-4.                                                                                                                                                             typescript ^5
-5.                                                                                                                                                             tailwindcss ^4
-6.                                                                                                                                                             shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                                                        runtime & pkg manager : bun.js
+2.                                                                                                                                                                                        npm i === bun add - npx === bunx
+3.                                                                                                                                                                                        nextjs 15.3.0 project setup
+4.                                                                                                                                                                                        typescript ^5
+5.                                                                                                                                                                                        tailwindcss ^4
+6.                                                                                                                                                                                        shadcnui 2.4.1 & --all ui components
 
 ## 02 customizations
 
@@ -141,4 +141,27 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 ## 04 payload cms integration
 
 - database setup
-  - for nested & relational data using MongoDB
+
+  - MongoDB integration for nested & relational data.
+  - integrated Payload CMS with MongoDB, enabling content management, authentication and admin interface.
+
+- Collections implemented
+
+  - added collections for Users (with authentication), Media (file uploads).
+
+- implemented API routes for REST and GraphQL endpoints, including GraphQL Playground.
+- API endpoints and admin interface routes are auto-generated for Payload, enabling REST, GraphQL, and admin UI functionality.
+
+## 05 search filters
+
+- `categories` collection configured & enhanced for search filters
+
+  - slug
+  - subcategories
+  - relationships
+
+- Search filters implemented
+
+  - search input
+  - displaying categories
+  - subcategory dropdown
