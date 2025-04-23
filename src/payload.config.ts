@@ -1,15 +1,32 @@
+import path from "path";
+import sharp from "sharp";
+import { buildConfig } from "payload";
+import { fileURLToPath } from "url";
+
 // storage-adapter-import-placeholder
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { payloadCloudPlugin } from "@payloadcms/payload-cloud";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import path from "path";
-import { buildConfig } from "payload";
-import { fileURLToPath } from "url";
-import sharp from "sharp";
 
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Categories } from "./collections/Categories";
+
+function validateEnv() {
+  const required = ["DATABASE_URI", "PAYLOAD_SECRET"];
+  const missing = required.filter((key) => !process.env[key]);
+
+  if (missing.length > 0) {
+    console.error(
+      `Error: Missing required environment variables: ${missing.join(", ")}`,
+    );
+    if (process.env.NODE_ENV === "production") {
+      process.exit(1);
+    }
+  }
+}
+
+validateEnv();
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -33,6 +50,11 @@ export default buildConfig({
   // Mongoose is shown as an example, but you can also use Postgres, SQL Server, etc.
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || "",
+    // Add connection options for better error handling
+    connectOptions: {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+    },
   }),
   sharp,
   plugins: [
