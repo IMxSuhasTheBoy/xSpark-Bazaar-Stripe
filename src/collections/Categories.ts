@@ -24,6 +24,12 @@ export const Categories: CollectionConfig = {
     {
       name: "color",
       type: "text",
+      validate: (value: string | undefined | null) => {
+        if (value && !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+          return "Color must be a valid hex code (e.g., #FFF or #FFFFFF)";
+        }
+        return true;
+      },
     },
     {
       name: "parent",
@@ -37,6 +43,6 @@ export const Categories: CollectionConfig = {
       collection: "categories",
       on: "parent",
       hasMany: true,
-    }
+    },
   ],
 };

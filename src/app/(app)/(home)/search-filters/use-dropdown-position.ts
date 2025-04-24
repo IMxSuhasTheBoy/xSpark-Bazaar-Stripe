@@ -20,7 +20,7 @@ export const useDropdownPosition = (
     // check if dropdown would go off the right edge of the viewport.
 
     if (left + dropdownWidth > window.innerWidth) {
-      // align to right edge of button insted
+      // align to right edge of button instead
       left = rect.right + window.scrollX - dropdownWidth;
 
       // If still off-screen, align to the right of viewport with some padding.
