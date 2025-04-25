@@ -1,16 +1,21 @@
 "use client";
+/* calculates visible categories based on container width;
+  integrates CategoriesSidebar for overflow; manages hover and active state;
+  responsive layout for different screen sizes.
+*/
 
 import { ListFilterIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { CustomCategory } from "../types";
+
 import { CategoryDropdown } from "./category-dropdown";
 import { CategoriesSidebar } from "./categories-sidebar";
+import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
 interface Props {
-  data: CustomCategory[];
+  data: CategoriesGetManyOutput;
 }
 
 export const Categories = ({ data }: Props) => {
@@ -58,6 +63,9 @@ export const Categories = ({ data }: Props) => {
     const resizeObserver = new ResizeObserver(calculateVisible);
     resizeObserver.observe(containerRef.current!);
 
+    // Initial run
+    calculateVisible();
+
     return () => resizeObserver.disconnect();
   }, [data.length]);
 
@@ -65,11 +73,7 @@ export const Categories = ({ data }: Props) => {
     <div className="relative w-full">
       {/* Categories sidebar */}
 
-      <CategoriesSidebar
-        open={isSidebarOpen}
-        onOpenChange={setIsSidebarOpen}
-        data={data}
-      />
+      <CategoriesSidebar open={isSidebarOpen} onOpenChange={setIsSidebarOpen} />
 
       {/*  testing: (app)/(home)/search-filters/Categories() page */}
       {/*   testing: {JSON.stringify(data, null, 2)} */}

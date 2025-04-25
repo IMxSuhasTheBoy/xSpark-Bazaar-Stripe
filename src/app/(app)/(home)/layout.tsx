@@ -1,47 +1,28 @@
-import { getPayload } from "payload";
-import configPromise from "@payload-config";
-import { Category } from "@/payload-types";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getQueryClient, trpc } from "@/trpc/server";
 
 import { Footer } from "./footer";
 import { Navbar } from "./navbar";
-import { SearchFilters } from "./search-filters";
-import { CustomCategory } from "./types";
+import { SearchFilters, SearchFiltersSkeleton } from "./search-filters";
+import { Suspense } from "react";
 
 interface Props {
   children: React.ReactNode;
 }
+
 const Layout = async ({ children }: Props) => {
-  const payload = await getPayload({
-    config: configPromise,
-  }); // initializes Payload CMS client
-
-  const data = await payload.find({
-    collection: "categories",
-    depth: 1, // Control relationship depth for populating subcategorie, subcategories.[0] will be of type "Category".
-    pagination: false,
-    where: {
-      parent: {
-        exists: false,
-      },
-    },
-    sort: "name",
-  }); // query db
-
-  const formatedData: CustomCategory[] = data.docs.map((doc) => ({
-    ...doc,
-    subcategories: (doc.subcategories?.docs || []).map((subDoc) => ({
-      // because of "depth: 1" we are confident "doc"  wil be a type of "Category".
-      ...(subDoc as Category),
-      subcategories: undefined,
-    })),
-  }));
-
-  console.log(formatedData);
+  // Prefetch categories data server-side to leverage React Server Components for improved initial load performance
+  const queryClient = getQueryClient();
+  void queryClient.prefetchQuery(trpc.categories.getMany.queryOptions());
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F4F4F0]">
       <Navbar />
-      <SearchFilters data={formatedData} />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <Suspense fallback={<SearchFiltersSkeleton />}>
+          <SearchFilters />
+        </Suspense>
+      </HydrationBoundary>
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

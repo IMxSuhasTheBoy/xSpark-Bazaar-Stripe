@@ -142,29 +142,44 @@ const seed = async () => {
   const payload = await getPayload({
     config,
   });
-
-  for (const category of categories) {
-    const parentCategory = await payload.create({
-      collection: "categories",
-      data: {
-        name: category.name,
-        slug: category.slug,
-        color: category.color,
-        parent: null,
-      },
-    });
-
-    for (const subCategory of category.subcategories || []) {
-      await payload.create({
+  try {
+    for (const category of categories) {
+      const parentCategory = await payload.create({
         collection: "categories",
         data: {
-          name: subCategory.name,
-          slug: subCategory.slug,
-          parent: parentCategory.id,
+          name: category.name,
+          slug: category.slug,
+          color: category.color,
+          parent: null,
         },
       });
+      for (const subCategory of category.subcategories || []) {
+        try {
+          await payload.create({
+            collection: "categories",
+            data: {
+              name: subCategory.name,
+              slug: subCategory.slug,
+              parent: parentCategory.id,
+            },
+          });
+          console.log(`Created subcategory: ${subCategory.name}`);
+        } catch (error) {
+          console.error(
+            `Failed to create subcategory ${subCategory.name}:`,
+            error,
+          );
+        }
+      }
+      console.log(
+        `Created category: ${category.name} with ${category.subcategories?.length || 0} subcategories`,
+      );
     }
+  } catch (error) {
+    console.error("Seeding failed:", error);
+    process.exit(1);
   }
+  console.log("Seeding completed successfully!");
 };
 
 await seed();
