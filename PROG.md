@@ -110,12 +110,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                                                                    runtime & pkg manager : bun.js
-2.                                                                                                                                                                                                    npm i === bun add - npx === bunx
-3.                                                                                                                                                                                                    nextjs 15.3.0 project setup
-4.                                                                                                                                                                                                    typescript ^5
-5.                                                                                                                                                                                                    tailwindcss ^4
-6.                                                                                                                                                                                                    shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                                                                                          runtime & pkg manager : bun.js
+2.                                                                                                                                                                                                                          npm i === bun add - npx === bunx
+3.                                                                                                                                                                                                                          nextjs 15.3.0 project setup
+4.                                                                                                                                                                                                                          typescript ^5
+5.                                                                                                                                                                                                                          tailwindcss ^4
+6.                                                                                                                                                                                                                          shadcnui 2.4.1 & --all ui components
 
 ## 02 customizations
 
@@ -166,15 +166,27 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
   - displaying categories
   - subcategory dropdown
 
-## categories ui finalized
+## 06 categories ui finalized
 
 - seeding categories
 
-  - categories seed script file
+  - database seeding script to populate categories with subcategories
 
 - custom category type (temporary)
 
 - responsiveness
 
-  - categories hidden that doesn't fit on screen
-  - categories sidebar for mobile viewport
+  - categories navigation hides overflow categories and adapts to screen size by dynamically truncating categories
+  - category navigation sidebar for improved browsing on mobile and desktop
+  - "View All" button and sidebar for categories, enabling hierarchical category navigation and easy access to all categories
+  -
+
+## 07 tRPC Set up with a React Server Components (RSC) framework
+
+- tRPC backend and router
+- client side fetcher
+- server side fetcher
+- "categoriesRouter"
+  - pre-fetch categories in layout component
+  - client side fetcher in categories sidebar component
+  - infered tRPC types
