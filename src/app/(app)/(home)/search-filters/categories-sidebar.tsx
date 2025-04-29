@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+type CategoryItem = CategoriesGetManyOutput[number];
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -23,15 +25,15 @@ interface Props {
 
 export const CategoriesSidebar = ({ open, onOpenChange }: Props) => {
   const trpc = useTRPC();
-  const { data } = useQuery(trpc.categories.getMany.queryOptions());
+  const { data, isError } = useQuery(trpc.categories.getMany.queryOptions());
 
   const router = useRouter();
 
   const [parentCategories, setParentCategories] =
     useState<CategoriesGetManyOutput | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<
-    CategoriesGetManyOutput[1] | null
-  >(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(
+    null,
+  );
 
   // If we have parent categories show those, otherwise show root categories
   const currentCategories = parentCategories ?? data ?? [];
@@ -42,9 +44,28 @@ export const CategoriesSidebar = ({ open, onOpenChange }: Props) => {
     onOpenChange(open);
   };
 
-  const handleCategoryClick = (category: CategoriesGetManyOutput[1]) => {
+  // Show error message if query fails
+  if (isError) {
+    return (
+      <Sheet open={open} onOpenChange={handleOpenChange}>
+        <SheetContent side="left" className="p-0 transition-none">
+          <SheetHeader className="border-b p-4">
+            <SheetTitle>Categories</SheetTitle>
+          </SheetHeader>
+          <div className="flex h-full items-center justify-center p-4 text-center">
+            <p>Error loading categories. Please try again later.</p>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  const handleCategoryClick = (category: CategoryItem) => {
     if (category.subcategories && category.subcategories.length > 0) {
-      setParentCategories(category.subcategories as CategoriesGetManyOutput);
+      // The subcategories are already in the correct format from the server
+      setParentCategories(
+        category.subcategories as unknown as CategoriesGetManyOutput,
+      );
       setSelectedCategory(category);
     } else {
       // This is a leaf category (no subcategories)

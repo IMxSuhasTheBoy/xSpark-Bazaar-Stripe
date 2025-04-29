@@ -9,10 +9,10 @@ import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
 import { CategoryDropdown } from "./category-dropdown";
 import { CategoriesSidebar } from "./categories-sidebar";
-import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
 interface Props {
   data: CategoriesGetManyOutput;
@@ -61,7 +61,9 @@ export const Categories = ({ data }: Props) => {
     };
 
     const resizeObserver = new ResizeObserver(calculateVisible);
-    resizeObserver.observe(containerRef.current!);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
 
     // Initial run
     calculateVisible();

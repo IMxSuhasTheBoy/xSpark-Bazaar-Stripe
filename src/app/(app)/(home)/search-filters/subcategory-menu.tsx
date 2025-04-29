@@ -1,10 +1,12 @@
 import Link from "next/link";
 
-import { Category } from "@/payload-types";
 import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
+type CategoryItem = CategoriesGetManyOutput[number];
+type SubcategoryItem = CategoryItem["subcategories"][number];
+
 interface Props {
-  category: CategoriesGetManyOutput[1];
+  category: CategoryItem;
   isOpen: boolean;
   position: { top: number; left: number };
 }
@@ -35,7 +37,7 @@ export const SubcategoryMenu = ({ category, isOpen, position }: Props) => {
         className="w-60 -translate-x-[2px] -translate-y-[2px] overflow-hidden rounded-md border text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
       >
         <div>
-          {category.subcategories?.map((subcategory: Category) => (
+          {category.subcategories?.map((subcategory: SubcategoryItem) => (
             <Link
               key={subcategory.slug}
               href={`/${category.slug}/${subcategory.slug}`}

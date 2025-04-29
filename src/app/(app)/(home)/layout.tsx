@@ -1,19 +1,20 @@
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { Suspense } from "react";
+
 import { getQueryClient, trpc } from "@/trpc/server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { Footer } from "./footer";
 import { Navbar } from "./navbar";
 import { SearchFilters, SearchFiltersSkeleton } from "./search-filters";
-import { Suspense } from "react";
 
 interface Props {
   children: React.ReactNode;
 }
 
+// Prefetch categories data server-side to leverage React Server Components for improved initial load performance
 const Layout = async ({ children }: Props) => {
-  // Prefetch categories data server-side to leverage React Server Components for improved initial load performance
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(trpc.categories.getMany.queryOptions());
+  await queryClient.prefetchQuery(trpc.categories.getMany.queryOptions());
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F4F4F0]">

@@ -1,3 +1,5 @@
+/* server-only tRPC proxy and cached query client getter for server-side usage */
+
 import "server-only"; // <-- ensure this file cannot be imported from the client
 import { cache } from "react";
 

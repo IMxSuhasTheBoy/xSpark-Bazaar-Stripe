@@ -110,12 +110,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                                                                                          runtime & pkg manager : bun.js
-2.                                                                                                                                                                                                                          npm i === bun add - npx === bunx
-3.                                                                                                                                                                                                                          nextjs 15.3.0 project setup
-4.                                                                                                                                                                                                                          typescript ^5
-5.                                                                                                                                                                                                                          tailwindcss ^4
-6.                                                                                                                                                                                                                          shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                                                                                                                  runtime & pkg manager : bun.js
+2.                                                                                                                                                                                                                                                  npm i === bun add - npx === bunx
+3.                                                                                                                                                                                                                                                  nextjs 15.3.0 project setup
+4.                                                                                                                                                                                                                                                  typescript ^5
+5.                                                                                                                                                                                                                                                  tailwindcss ^4
+6.                                                                                                                                                                                                                                                  shadcnui 2.4.1 & --all ui components
 
 ## 02 customizations
 
@@ -183,10 +183,16 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 07 tRPC Set up with a React Server Components (RSC) framework
 
-- tRPC backend and router
-- client side fetcher
-- server side fetcher
+- tRPC backend and router:
+  - tRPC server context setup, base router, and base procedure middleware for Payload CMS integration
+  - tRPC React client setup with React Query integration and provider component
+  - utility to create a React Query client with custom cache and hydration settings
+  - main tRPC app router, integrating the categories router and exporting types
+  - modules for tRPC server/client setup, query client instantiation
+  - server-only tRPC proxy and cached query client getter for server-side usage
 - "categoriesRouter"
+  - categories API endpoint that provides categories with subcategories
   - pre-fetch categories in layout component
-  - client side fetcher in categories sidebar component
-  - infered tRPC types
+  - react Query for efficient client-side data fetching and caching internally in categories sidebar component
+  - replaced custom category types with types inferred from tRPC outputs
+- refactored components to fetch data internally via tRPC, removed data prop drilling and centralized data management

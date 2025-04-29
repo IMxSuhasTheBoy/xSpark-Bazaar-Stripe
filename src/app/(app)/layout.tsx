@@ -22,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.className} antialiased`}>
+        {/* tRPC context. */}
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>

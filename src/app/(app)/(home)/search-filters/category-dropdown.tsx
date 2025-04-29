@@ -5,13 +5,15 @@ import { useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
 import { SubcategoryMenu } from "./subcategory-menu";
 import { useDropdownPosition } from "./use-dropdown-position";
-import { CategoriesGetManyOutput } from "@/modules/categories/types";
+
+type CategoryItem = CategoriesGetManyOutput[number];
 
 interface Props {
-  category: CategoriesGetManyOutput[1];
+  category: CategoryItem;
   isActive?: boolean;
   isNavigationHoverd?: boolean;
 }

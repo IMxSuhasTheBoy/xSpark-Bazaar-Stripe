@@ -1,3 +1,5 @@
+/* main tRPC app router, integrating the categories router and exporting types */
+
 import { categoriesRouter } from "@/modules/categories/server/procedures";
 
 import { createTRPCRouter } from "../init";
