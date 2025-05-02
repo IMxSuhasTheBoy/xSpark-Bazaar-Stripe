@@ -110,12 +110,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                                                                                                                  runtime & pkg manager : bun.js
-2.                                                                                                                                                                                                                                                  npm i === bun add - npx === bunx
-3.                                                                                                                                                                                                                                                  nextjs 15.3.0 project setup
-4.                                                                                                                                                                                                                                                  typescript ^5
-5.                                                                                                                                                                                                                                                  tailwindcss ^4
-6.                                                                                                                                                                                                                                                  shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                                                                                                                          runtime & pkg manager : bun.js
+2.                                                                                                                                                                                                                                                          npm i === bun add - npx === bunx
+3.                                                                                                                                                                                                                                                          nextjs 15.3.0 project setup
+4.                                                                                                                                                                                                                                                          typescript ^5
+5.                                                                                                                                                                                                                                                          tailwindcss ^4
+6.                                                                                                                                                                                                                                                          shadcnui 2.4.1 & --all ui components
 
 ## 02 customizations
 
@@ -196,3 +196,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
   - react Query for efficient client-side data fetching and caching internally in categories sidebar component
   - replaced custom category types with types inferred from tRPC outputs
 - refactored components to fetch data internally via tRPC, removed data prop drilling and centralized data management
+
+## 08 authentication
+
+- updates to "Users" collection
+  - "username" field
+- authentication procedures (trpc auth routers)
+  - using payload auth utils
+- authentication screens
+  - login and register views

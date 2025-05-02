@@ -49,6 +49,7 @@ export const NavbarSidebar = ({
   }) => (
     <Link
       href={href}
+      prefetch
       onClick={handleLinkClick}
       className={cn(
         "flex w-full items-center border-y border-transparent p-4 text-left text-base font-medium",

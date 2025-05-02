@@ -100,10 +100,14 @@ export const Navbar = () => {
 
       <div className="hidden lg:flex">
         <Button asChild variant="secondary" className={cn(buttonStyles.signin)}>
-          <Link href="/sign-in">Log in</Link>
+          <Link prefetch href="/sign-in">
+            Log in
+          </Link>
         </Button>
         <Button asChild className={cn(buttonStyles.signup)}>
-          <Link href="/sign-up">Start selling</Link>
+          <Link prefetch href="/sign-up">
+            Start selling
+          </Link>
         </Button>
       </div>
 
