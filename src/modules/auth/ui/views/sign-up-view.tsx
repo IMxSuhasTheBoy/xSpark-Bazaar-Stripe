@@ -174,9 +174,9 @@ export const SignUpView = () => {
                   <FormControl>
                     <Input {...field} type="password" />
                   </FormControl>
-                  {!passwordsMatch && confirmPassword && (
-                    <p className="mt-1 text-sm text-red-500">
-                      Passwords do not match.
+                  {passwordsMatch && confirmPassword && (
+                    <p className="mt-1 text-sm text-green-600">
+                      ✔
                     </p>
                   )}
 
