@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   Form,
@@ -33,15 +33,19 @@ const poppins = Poppins({
 
 export const SignUpView = () => {
   const router = useRouter();
+
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const register = useMutation(
     trpc.auth.register.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(trpc.auth.session.queryFilter());
         toast.success("Account created successfully!");
         router.push("/");
       },
       onError: (error) => {
-        toast.error(error.message);
+        toast.error(error.message || "Something went wrong, please try again.");
       },
     }),
   );
@@ -53,11 +57,21 @@ export const SignUpView = () => {
       email: "",
       password: "",
       username: "",
+      confirmPassword: "",
     },
   });
 
+  const password = form.watch("password");
+  const confirmPassword = form.watch("confirmPassword");
+
+  const passwordsMatch = password === confirmPassword;
+
   const onSubmit = (values: z.infer<typeof registerSchema>) => {
-    register.mutate(values);
+    register.mutate({
+      email: values.email,
+      password: values.password,
+      username: values.username,
+    });
   };
 
   const username = form.watch("username");
@@ -66,8 +80,17 @@ export const SignUpView = () => {
   const showPreview = username && !usernameErrors;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5">
-      <div className="h-screen w-full overflow-y-auto bg-[#F4F4F4] lg:col-span-3">
+    <div className="grid grid-cols-1 lg:grid-cols-9">
+      <div
+        className="hidden h-screen w-full lg:col-span-1 lg:block"
+        // style={{ backgroundColor: "#A4A4F4" }}
+        style={{
+          backgroundImage: "url('/auth-bg.png')",
+          backgroundPosition: "20% 0%",
+        }}
+      />
+
+      <div className="h-screen w-full overflow-y-auto bg-[#F4F4F4] lg:col-span-6">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -87,7 +110,9 @@ export const SignUpView = () => {
                 size="sm"
                 className="border-none text-base underline"
               >
-                <Link href="/sign-in"> Sign in</Link>
+                <Link href="/sign-in" prefetch>
+                  Sign in
+                </Link>
               </Button>
             </div>
             <h1 className="text-4xl font-medium">Welcome to xSparkBazaar</h1>
@@ -141,22 +166,41 @@ export const SignUpView = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-base">Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" />
+                  </FormControl>
+                  {!passwordsMatch && confirmPassword && (
+                    <p className="mt-1 text-sm text-red-500">
+                      Passwords do not match.
+                    </p>
+                  )}
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button
-              disabled={register.isPending}
+              disabled={register.isPending || !passwordsMatch}
               type="submit"
               size="lg"
               variant="elevated"
               className="hover:text-primary bg-black text-white hover:bg-amber-400"
             >
-              Create account
+              {register.isPending ? "Creating account..." : "Create account"}
             </Button>
           </form>
         </Form>
       </div>
       <div
         className="h-screen w-full lg:col-span-2 lg:block"
-        style={{ backgroundColor: "#A4A4F4" }}
-        // style={{ backgroundImage : "url{'/auth-bg.png'}",
+        style={{ backgroundColor: "#FBBF24" }}
+        // style={{ backgroundImage : "url('/auth-bg.png')",
         //   backgroundSize: 'cover',
         //   backgroundPosition: 'center'
         //  }}

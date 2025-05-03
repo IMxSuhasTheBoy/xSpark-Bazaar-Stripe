@@ -1,9 +1,9 @@
-import { headers as getHeaders, cookies as getCookies } from "next/headers";
+import { headers as getHeaders } from "next/headers";
 
 import { TRPCError } from "@trpc/server";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 
-import { AUTH_COOKIE } from "../constants";
+import { generateAuthCookie } from "../utils";
 import { loginSchema, registerSchema } from "../schemas";
 
 export const authRouter = createTRPCRouter({
@@ -18,7 +18,7 @@ export const authRouter = createTRPCRouter({
   }),
 
   register: baseProcedure
-    .input(registerSchema)
+    .input(registerSchema.innerType().omit({ confirmPassword: true }))
     .mutation(async ({ input, ctx }) => {
       const existingData = await ctx.db.find({
         collection: "users",
@@ -34,7 +34,7 @@ export const authRouter = createTRPCRouter({
       if (existingUser) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Username already exists.",
+          message: "Username already taken.",
         });
       }
 
@@ -63,16 +63,9 @@ export const authRouter = createTRPCRouter({
         });
       }
 
-      const cookie = await getCookies();
-      cookie.set({
-        name: AUTH_COOKIE,
+      await generateAuthCookie({
+        prefix: ctx.db.config.cookiePrefix,
         value: data.token,
-        httpOnly: true,
-        path: "/",
-
-        // TODO: Ensure cross-domain cookie sharing
-        // sameSite: "none"
-        // domain: ""
       });
     }),
 
@@ -92,16 +85,9 @@ export const authRouter = createTRPCRouter({
       });
     }
 
-    const cookie = await getCookies();
-    cookie.set({
-      name: AUTH_COOKIE,
+    await generateAuthCookie({
+      prefix: ctx.db.config.cookiePrefix,
       value: data.token,
-      httpOnly: true,
-      path: "/",
-
-      // TODO: Ensure cross-domain cookie sharing
-      // sameSite: "none"
-      // domain: ""
     });
 
     return data;
@@ -113,11 +99,11 @@ export const authRouter = createTRPCRouter({
     - Effectively ends the user's session
     - No authentication required to perform logout
   */
-  logout: baseProcedure.mutation(async ({}) => {
-    const cookie = await getCookies();
-    cookie.delete({
-      name: AUTH_COOKIE,
-      path: "/",
-    });
-  }),
+  // logout: baseProcedure.mutation(async () => {
+  //   const cookie = await getCookies();
+  //   cookie.delete({
+  //     name: AUTH_COOKIE,
+  //     path: "/",
+  //   });
+  // }),
 });

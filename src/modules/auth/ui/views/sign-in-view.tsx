@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   Form,
@@ -32,15 +32,19 @@ const poppins = Poppins({
 
 export const SignInView = () => {
   const router = useRouter();
+
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const login = useMutation(
     trpc.auth.login.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(trpc.auth.session.queryFilter());
         toast.success("Logged in successfully!");
         router.push("/");
       },
       onError: (error) => {
-        toast.error(error.message);
+        toast.error(error.message || "Something went wrong, please try again.");
       },
     }),
   );
@@ -80,7 +84,9 @@ export const SignInView = () => {
                 size="sm"
                 className="border-none text-base underline"
               >
-                <Link href="/sign-up"> Sign up</Link>
+                <Link href="/sign-up" prefetch>
+                  Sign up
+                </Link>
               </Button>
             </div>
             <h1 className="text-4xl font-medium">
@@ -116,6 +122,14 @@ export const SignInView = () => {
                 </FormItem>
               )}
             />
+
+            {/* // TODO: Uncomment this when the forgot password page is ready 
+             <div className="flex justify-end">
+              <Button variant="link" className="px-0" asChild>
+                <Link href="/forgot-password">Forgot password?</Link>
+              </Button>
+            </div> */}
+
             <Button
               disabled={login.isPending}
               type="submit"
