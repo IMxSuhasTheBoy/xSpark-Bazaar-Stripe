@@ -6,6 +6,9 @@ import { Poppins } from "next/font/google";
 import { usePathname } from "next/navigation";
 import { MenuIcon } from "lucide-react";
 
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/client";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavbarSidebar } from "./navbar-sidebar";
@@ -71,6 +74,9 @@ export const Navbar = () => {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const trpc = useTRPC();
+  const session = useQuery(trpc.auth.session.queryOptions());
+
   return (
     <nav className="flex h-20 justify-between border-b bg-white font-medium">
       <Link href="/" className="flex items-center pl-6">
@@ -98,18 +104,31 @@ export const Navbar = () => {
         ))}
       </div>
 
-      <div className="hidden lg:flex">
-        <Button asChild variant="secondary" className={cn(buttonStyles.signin)}>
-          <Link prefetch href="/sign-in">
-            Log in
-          </Link>
-        </Button>
-        <Button asChild className={cn(buttonStyles.signup)}>
-          <Link prefetch href="/sign-up">
-            Start selling
-          </Link>
-        </Button>
-      </div>
+      {session.data?.user ? (
+        <div className="hidden lg:flex">
+          <Button asChild className={cn(buttonStyles.signup)}>
+            <Link href="/admin">Dashboard</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="hidden lg:flex">
+          <Button
+            asChild
+            variant="secondary"
+            className={cn(buttonStyles.signin)}
+          >
+            <Link prefetch href="/sign-in">
+              Log in
+            </Link>
+          </Button>
+
+          <Button asChild className={cn(buttonStyles.signup)}>
+            <Link prefetch href="/sign-up">
+              Start selling
+            </Link>
+          </Button>
+        </div>
+      )}
 
       <div className="flex items-center justify-center lg:hidden">
         <Button
