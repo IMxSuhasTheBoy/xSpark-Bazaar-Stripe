@@ -110,12 +110,12 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                                                                                                                                                                  runtime & pkg manager : bun.js
-2.                                                                                                                                                                                                                                                                                                  npm i === bun add - npx === bunx
-3.                                                                                                                                                                                                                                                                                                  nextjs 15.3.0 project setup
-4.                                                                                                                                                                                                                                                                                                  typescript ^5
-5.                                                                                                                                                                                                                                                                                                  tailwindcss ^4
-6.                                                                                                                                                                                                                                                                                                  shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                                                                                                                                                                                runtime & pkg manager : bun.js
+2.                                                                                                                                                                                                                                                                                                                npm i === bun add - npx === bunx
+3.                                                                                                                                                                                                                                                                                                                nextjs 15.3.0 project setup
+4.                                                                                                                                                                                                                                                                                                                typescript ^5
+5.                                                                                                                                                                                                                                                                                                                tailwindcss ^4
+6.                                                                                                                                                                                                                                                                                                                shadcnui 2.4.1 & --all ui components
 
 ## 02 customizations
 
@@ -214,11 +214,24 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 - automatically set cookie on login using payload REST API
 - authenticated states:
   - navigation and search filters dynamically display authentication-dependent options, such as "Dashboard" or "Library" buttons, based on users login state
-  - already logged in users are redirected away from sign-in and sign-up pages
+  - already logged-in users are redirected away from sign-in and sign-up pages
   - performs server-side session checks for cache invalidation on login/register
 
 ## 10 category pages routing
 
-- dynamic extraction of URL parameters for nested dynamic routing pages of categories and subcategories
-  - styling of current selected main category applies to the search filters styling
-  - breadcrumb for category pages
+- dynamic extraction of URL parameters
+  - nested dynamic routing pages of categories and subcategories
+  - background color of search filters adapts to the current selected main category
+  - breadcrumb navigation for category pages
+
+## 11 Products collection
+
+- "Products" collection
+
+  -
+
+- products data loading based on category
+  - prefetches in RSC
+  - loads with suspense in client component
+  - loads products data of subcategory based on subcategory
+  - loads products data of all subcategory (and category*) based on category

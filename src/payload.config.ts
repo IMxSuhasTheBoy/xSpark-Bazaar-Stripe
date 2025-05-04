@@ -11,6 +11,7 @@ import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Categories } from "./collections/Categories";
+import { Products } from "./collections/Products";
 
 function validateEnv() {
   const required = ["DATABASE_URI", "PAYLOAD_SECRET"];
@@ -39,7 +40,7 @@ export default buildConfig({
     },
   },
   // Define and configure your collections in this array
-  collections: [Users, Media, Categories],
+  collections: [Users, Media, Categories, Products],
   editor: lexicalEditor(),
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || "",
