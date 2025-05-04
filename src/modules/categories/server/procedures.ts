@@ -17,16 +17,16 @@ export const categoriesRouter = createTRPCRouter({
         sort: "name",
       }); // query db
 
-      const formatedData = data.docs.map((doc) => ({
+      const formattedData = data.docs.map((doc) => ({
         ...doc,
-        subcategories: (doc.subcategories?.docs || []).map((subDoc) => ({
+        subcategories: (doc.subcategories?.docs ?? []).map((subDoc) => ({
           // because of "depth: 1" we are confident "doc"  wil be a type of "Category".
           ...(subDoc as Category),
           subcategories: undefined,
         })),
       }));
 
-      return formatedData;
+      return formattedData;
     } catch (error) {
       console.error("Error fetching categories:", error);
       throw new TRPCError({

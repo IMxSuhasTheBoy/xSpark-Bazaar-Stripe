@@ -11,6 +11,7 @@ import { CategoriesGetManyOutput } from "@/modules/categories/types";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -48,6 +49,7 @@ export const CategoriesSidebar = ({ open, onOpenChange }: Props) => {
   if (isError) {
     return (
       <Sheet open={open} onOpenChange={handleOpenChange}>
+        <SheetDescription className="sr-only">Categories</SheetDescription>
         <SheetContent side="left" className="p-0 transition-none">
           <SheetHeader className="border-b p-4">
             <SheetTitle>Categories</SheetTitle>
@@ -96,6 +98,7 @@ export const CategoriesSidebar = ({ open, onOpenChange }: Props) => {
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetDescription className="sr-only">Categories</SheetDescription>
       <SheetContent
         side="left"
         className="p-0 transition-none"
@@ -127,7 +130,7 @@ export const CategoriesSidebar = ({ open, onOpenChange }: Props) => {
               <button
                 key={category.slug}
                 onClick={() => handleCategoryClick(category)}
-                // keyboard navigation support
+                // keyboard navigation support test
                 aria-expanded={
                   selectedCategory?.slug === category.slug &&
                   category.subcategories &&
