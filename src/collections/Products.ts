@@ -9,7 +9,7 @@ export const Products: CollectionConfig = {
       required: true,
     },
     {
-      name: "descrption",
+      name: "description",
       type: "text",
     },
     {
@@ -39,3 +39,38 @@ export const Products: CollectionConfig = {
     },
   ],
 };
+
+/*
+additions:
+
+{
+      name: "sku",
+      type: "text",
+      admin: {
+        description: "Unique product identifier",
+      },
+    },
+    {
+      name: "stockQuantity",
+      type: "number",
+      defaultValue: 0,
+      admin: {
+        description: "Available inventory",
+      },
+    },
+    {
+      name: "brand",
+      type: "text",
+    },
+    {
+      name: "tags",
+      type: "array",
+      fields: [
+        {
+          name: "tag",
+          type: "text",
+        },
+      ],
+    },
+
+*/
