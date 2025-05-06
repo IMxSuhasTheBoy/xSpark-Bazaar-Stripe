@@ -65,9 +65,7 @@ export const CategoriesSidebar = ({ open, onOpenChange }: Props) => {
   const handleCategoryClick = (category: CategoryItem) => {
     if (category.subcategories && category.subcategories.length > 0) {
       // The subcategories are already in the correct format from the server
-      setParentCategories(
-        category.subcategories as unknown as CategoriesGetManyOutput,
-      );
+      setParentCategories(category.subcategories as CategoriesGetManyOutput);
       setSelectedCategory(category);
     } else {
       // This is a leaf category (no subcategories)

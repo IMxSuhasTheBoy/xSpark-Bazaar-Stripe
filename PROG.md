@@ -110,12 +110,13 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                                                                                                                                                                                runtime & pkg manager : bun.js
-2.                                                                                                                                                                                                                                                                                                                npm i === bun add - npx === bunx
-3.                                                                                                                                                                                                                                                                                                                nextjs 15.3.0 project setup
-4.                                                                                                                                                                                                                                                                                                                typescript ^5
-5.                                                                                                                                                                                                                                                                                                                tailwindcss ^4
-6.                                                                                                                                                                                                                                                                                                                shadcnui 2.4.1 & --all ui components
+1.                                                                                                                                                                                                                                                                                                                                          runtime & pkg manager : bun.js
+2.                                                                                                                                                                                                                                                                                                                                          npm i === bun add - npx === bunx
+3.                                                                                                                                                                                                                                                                                                                                          nextjs ^15.3.0 project setup
+4.                                                                                                                                                                                                                                                                                                                                          typescript ^5
+5.                                                                                                                                                                                                                                                                                                                                          tailwindcss ^4
+6.                                                                                                                                                                                                                                                                                                                                          shadcnui ^2.4.1 & --all ui components
+7.                                                                                                                                                                                                                                                                                                                                          nuqs ^2.4.3
 
 ## 02 customizations
 
@@ -224,14 +225,37 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
   - background color of search filters adapts to the current selected main category
   - breadcrumb navigation for category pages
 
-## 11 Products collection
+## 11 products collection
 
 - "Products" collection
 
-  -
+  - fields for name, description, price, category, image, and refund policy.
+  - admin configuration
+  - relationship with categories and media
 
-- products data loading based on category
-  - prefetches in RSC
-  - loads with suspense in client component
+- products data loading based on category using tRPC and React Query
+  - server-side data prefetching in RSC
+  - client-side suspense loading and hydration
   - loads products data of subcategory based on subcategory
-  - loads products data of all subcategory (and category*) based on category
+  - loads products data of all subcategory (and category\*) based on category
+
+## 12 product filters section
+
+- NUQS configuration
+
+  - adapter
+  - useProductFilters hook for managing filter query states
+
+- price filter interface
+
+  - min/max input fields
+  - input change handlers
+  - formatting function
+
+- category page layout updates
+
+  - product filters component
+  - products responsive grid layout
+
+- procedure updates
+  - processes raw price filter values

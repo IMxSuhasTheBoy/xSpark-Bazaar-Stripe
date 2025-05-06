@@ -82,7 +82,7 @@ export const Navbar = () => {
     <nav className="flex h-20 justify-between border-b bg-white font-medium">
       <Link href="/" className="flex items-center pl-6">
         <span className={cn("text-5xl font-semibold", poppins.className)}>
-          xSparkBazaar
+          .............
         </span>
       </Link>
 

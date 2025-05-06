@@ -14,10 +14,12 @@ interface Props {
 
 const Page = async ({ params }: Props) => {
   const { subcategory } = await params;
-  // prefetch categories data server-side to leverage React Server Components for improved initial load performance
-  // strategy: component for prefetching data then suspense loading in the client
+
+  // Prefetch subcategories data server-side to leverage React Server Components for improved initial load performance
+  // strategy: component for prefetching data then suspense loading in the client component (ProductList)
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(
+
+  await queryClient.prefetchQuery(
     trpc.products.getMany.queryOptions({
       category: subcategory,
     }),
@@ -26,6 +28,7 @@ const Page = async ({ params }: Props) => {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Suspense fallback={<ProductListSkeleton />}>
+        {/* Using subcategory as category since we're in the subcategory route */}
         <ProductList category={subcategory} />
       </Suspense>
     </HydrationBoundary>

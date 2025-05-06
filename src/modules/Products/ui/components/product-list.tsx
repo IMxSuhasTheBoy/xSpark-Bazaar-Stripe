@@ -9,28 +9,44 @@ interface Props {
 
 export const ProductList = ({ category }: Props) => {
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(
+  const { data, error } = useSuspenseQuery(
     trpc.products.getMany.queryOptions({
       category,
     }),
   );
 
-  return <div>{JSON.stringify(data, null, 2)}</div>;
+  if (error) {
+    return (
+      <div className="rounded-md border border-red-200 bg-red-50 p-4 text-red-700">
+        <p className="font-medium">Failed to load products</p>
+        <p className="text-sm">{error.message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      {data?.docs.map((product) => (
+        <div key={product.id} className="rounded-md border bg-white p-4">
+          <h2>{product.name}</h2>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export const ProductListSkeleton = () => {
   return (
-    <div className="animate-pulse">
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading... Loading... Loading... Loading... Loading... Loading...
-      Loading...
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <div key={index} className="rounded-md border bg-white p-4">
+          <div className="h-4 w-full animate-pulse bg-gray-200" />
+          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
+          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
+          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
+          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
+        </div>
+      ))}
     </div>
   );
 };

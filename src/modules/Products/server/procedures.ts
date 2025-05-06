@@ -10,10 +10,30 @@ export const productsRouter = createTRPCRouter({
     .input(
       z.object({
         category: z.string().nullable().optional(),
+        minPrice: z.string().nullable().optional(),
+        maxPrice: z.string().nullable().optional(),
+        // TODO: pagination parameters
+        // page: z.number().min(1).optional(),
+        // limit: z.number().min(1).max(100).optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const where: Where = {};
+
+      // price filters
+      if (input.minPrice) {
+        where.price = {
+          ...where.price,
+          greater_than_equal: input.minPrice,
+        };
+      }
+
+      if (input.maxPrice) {
+        where.price = {
+          ...where.price,
+          less_than_equal: input.maxPrice,
+        };
+      }
 
       if (input.category) {
         const categoriesData = await ctx.db.find({
@@ -42,17 +62,25 @@ export const productsRouter = createTRPCRouter({
         const subcategoriesSlugs = [];
         const parentCategory = formattedData[0];
 
+        // if (!parentCategory) {
+        //   // Handle the case when no category matches the provided slug
+        //   throw new TRPCError({
+        //     code: "NOT_FOUND",
+        //     message: `Category with slug "${input.category}" not found`,
+        //   });
+        // }
+
         if (parentCategory) {
           subcategoriesSlugs.push(
             ...parentCategory.subcategories.map(
               (subcategory) => subcategory.slug,
             ),
           );
-        }
 
-        where["category.slug"] = {
-          in: [parentCategory.slug, ...subcategoriesSlugs],
-        };
+          where["category.slug"] = {
+            in: [parentCategory.slug, ...subcategoriesSlugs],
+          };
+        }
       }
 
       try {
@@ -60,6 +88,9 @@ export const productsRouter = createTRPCRouter({
           collection: "products",
           depth: 1, // Control relationship depth for populating category & image.
           where,
+          // TODO: pagination parameters
+          // limit: 20,
+          // pagination: false,
         }); // query db
 
         return data;

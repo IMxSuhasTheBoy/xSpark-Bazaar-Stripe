@@ -183,7 +183,7 @@ export interface Category {
 export interface Product {
   id: string;
   name: string;
-  descrption?: string | null;
+  description?: string | null;
   /**
    * Price in INR
    */
@@ -312,7 +312,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   name?: T;
-  descrption?: T;
+  description?: T;
   price?: T;
   category?: T;
   image?: T;
