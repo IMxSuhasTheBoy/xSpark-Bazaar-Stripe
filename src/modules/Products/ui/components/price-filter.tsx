@@ -14,6 +14,7 @@ export const formatAsCurrency = (value: string) => {
   // replace non-numeric characters with empty string
   const numericValue = value.replace(/[^0-9.]/g, "");
 
+  // could be improved to ensure only one decimal point is retained. Currently, if a user enters multiple decimal points, it will keep only the first part with decimals. ( pr #13 )
   const parts = numericValue.split(".");
   const formattedValue =
     parts[0] + (parts.length > 1 ? "." + parts[1]?.slice(0, 2) : "");
@@ -37,16 +38,14 @@ export const PriceFilter = ({
   onMinPriceChange,
   onMaxPriceChange,
 }: Props) => {
-  const handleMinPriceChange = (event: ChangeEvent<HTMLInputElement>) => {
-    // getting the rew input value and extract only numeric values after it
+  // Extract numeric values from input and call the appropriate handler
+  const handlePriceChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    onChangeHandler: (value: string) => void,
+  ) => {
+    // getting the raw input value and extract only numeric values
     const numericValue = event.target.value.replace(/[^0-9.]/g, "");
-    onMinPriceChange(numericValue);
-  };
-
-  const handleMaxPriceChange = (event: ChangeEvent<HTMLInputElement>) => {
-    // getting the rew input value and extract only numeric values after it
-    const numericValue = event.target.value.replace(/[^0-9.]/g, "");
-    onMaxPriceChange(numericValue);
+    onChangeHandler(numericValue);
   };
 
   return (
@@ -57,7 +56,7 @@ export const PriceFilter = ({
           type="text"
           placeholder="₹0"
           value={minPrice ? formatAsCurrency(minPrice) : ""}
-          onChange={handleMinPriceChange}
+          onChange={(event) => handlePriceChange(event, onMinPriceChange)}
         />
       </div>
 
@@ -67,7 +66,7 @@ export const PriceFilter = ({
           type="text"
           placeholder="∞"
           value={maxPrice ? formatAsCurrency(maxPrice) : ""}
-          onChange={handleMaxPriceChange}
+          onChange={(event) => handlePriceChange(event, onMaxPriceChange)}
         />
       </div>
     </div>
