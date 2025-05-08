@@ -1,8 +1,15 @@
 "use client";
 
-import { useTRPC } from "@/trpc/client";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { InboxIcon } from "lucide-react";
 
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+
+import { DEFAULT_LIMIT } from "@/constants";
+
+import { Button } from "@/components/ui/button";
+
+import { ProductCard, ProductCardSkeleton } from "./product-card";
 import { useProductFilters } from "../../hooks/use-product-filters";
 
 interface Props {
@@ -13,45 +20,81 @@ export const ProductList = ({ category }: Props) => {
   const [filters] = useProductFilters();
 
   const trpc = useTRPC();
-  const { data, error } = useSuspenseQuery(
-    trpc.products.getMany.queryOptions({
-      category,
-      ...filters,
-    }),
-  );
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useSuspenseInfiniteQuery(
+      trpc.products.getMany.infiniteQueryOptions(
+        {
+          ...filters,
+          category,
+          limit: DEFAULT_LIMIT,
+        },
+        {
+          getNextPageParam: (lastPage) => {
+            return lastPage.docs.length > 0 ? lastPage.nextPage : undefined;
+          },
+        },
+      ),
+    );
+
+  if (data.pages?.[0]?.docs.length === 0) {
+    return (
+      <div className="flex w-full flex-col items-center justify-center gap-y-4 rounded-lg border border-dashed border-black bg-white p-8">
+        <InboxIcon />
+        <p className="text-base font-medium">No products found</p>
+      </div>
+    );
+  }
 
   if (error) {
     return (
-      <div className="rounded-md border border-red-200 bg-red-50 p-4 text-red-700">
-        <p className="font-medium">Failed to load products</p>
+      <div className="flex w-full flex-col items-center justify-center gap-y-4 rounded-lg border border-dashed bg-white p-8">
+        <p className="text-base font-medium">Failed to load products</p>
         <p className="text-sm">{error.message}</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      {data?.docs.map((product) => (
-        <div key={product.id} className="rounded-md border bg-white p-4">
-          <h2>{product.name}</h2>
-          <p>{product.price}</p>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        {data?.pages
+          .flatMap((page) => page.docs)
+          .map((product) => (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              authorUsername={"hardcoded"}
+              authorImageUrl={undefined}
+              imageUrl={product.image?.url}
+              price={product.price}
+              reviewCount={5}
+              reviewRating={3}
+            />
+          ))}
+      </div>
+
+      <div className="flex justify-center pt-8">
+        {hasNextPage && (
+          <Button
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+            variant="elevated"
+            className="bg-white text-base font-medium disabled:opacity-50"
+          >
+            {isFetchingNextPage ? "Loading more..." : "Load More"}
+          </Button>
+        )}
+      </div>
+    </>
   );
 };
 
 export const ProductListSkeleton = () => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      {Array.from({ length: 8 }).map((_, index) => (
-        <div key={index} className="rounded-md border bg-white p-4">
-          <div className="h-4 w-full animate-pulse bg-gray-200" />
-          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
-          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
-          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
-          <div className="mt-2 h-4 w-full animate-pulse bg-gray-200" />
-        </div>
+      {Array.from({ length: DEFAULT_LIMIT }).map((_, index) => (
+        <ProductCardSkeleton key={index} />
       ))}
     </div>
   );

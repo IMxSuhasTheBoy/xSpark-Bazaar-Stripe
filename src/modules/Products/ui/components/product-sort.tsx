@@ -8,51 +8,34 @@ import { useProductFilters } from "../../hooks/use-product-filters";
 
 export const ProductSort = () => {
   const [filters, setFilters] = useProductFilters();
+  const sortOptions: {
+    value: "curated" | "trending" | "new";
+    label: string;
+  }[] = [
+    { value: "curated", label: "Curated" },
+    { value: "trending", label: "Trending" },
+    { value: "new", label: "New" },
+  ];
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        size="sm"
-        variant="secondary"
-        className={cn(
-          "rounded-full bg-white hover:bg-white",
-          filters.sort !== "curated" &&
-            "hover:border-border border-transparent bg-transparent hover:bg-transparent",
-        )}
-        onClick={() => {
-          setFilters({ sort: "curated" });
-        }}
-      >
-        Curated
-      </Button>
-      <Button
-        size="sm"
-        variant="secondary"
-        className={cn(
-          "rounded-full bg-white hover:bg-white",
-          filters.sort !== "trending" &&
-            "hover:border-border border-transparent bg-transparent hover:bg-transparent",
-        )}
-        onClick={() => {
-          setFilters({ sort: "trending" });
-        }}
-      >
-        Trending
-      </Button>
-      <Button
-        size="sm"
-        variant="secondary"
-        className={cn(
-          "rounded-full bg-white hover:bg-white",
-          filters.sort !== "new" &&
-            "hover:border-border border-transparent bg-transparent hover:bg-transparent",
-        )}
-        onClick={() => {
-          setFilters({ sort: "new" });
-        }}
-      >
-        New
-      </Button>
+      {sortOptions.map((option) => (
+        <Button
+          key={option.value}
+          size="sm"
+          variant="secondary"
+          className={cn(
+            "rounded-full bg-white hover:bg-white",
+            filters.sort !== option.value &&
+              "hover:border-border border-transparent bg-transparent hover:bg-transparent",
+          )}
+          onClick={() => {
+            setFilters({ sort: option.value });
+          }}
+        >
+          {option.label}
+        </Button>
+      ))}
     </div>
   );
 };

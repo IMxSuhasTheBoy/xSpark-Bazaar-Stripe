@@ -110,13 +110,13 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                                                                                                                                                                                                                  runtime & pkg manager : bun.js
-2.                                                                                                                                                                                                                                                                                                                                                  npm i === bun add - npx === bunx
-3.                                                                                                                                                                                                                                                                                                                                                  nextjs ^15.3.0 project setup
-4.                                                                                                                                                                                                                                                                                                                                                  typescript ^5
-5.                                                                                                                                                                                                                                                                                                                                                  tailwindcss ^4
-6.                                                                                                                                                                                                                                                                                                                                                  shadcnui ^2.4.1 & --all ui components
-7.                                                                                                                                                                                                                                                                                                                                                  nuqs ^2.4.3
+1.                                                                                                                                                                                                                                                                                                                                                                           runtime & pkg manager : bun.js
+2.                                                                                                                                                                                                                                                                                                                                                                           npm i === bun add - npx === bunx
+3.                                                                                                                                                                                                                                                                                                                                                                           nextjs ^15.3.0 project setup
+4.                                                                                                                                                                                                                                                                                                                                                                           typescript ^5
+5.                                                                                                                                                                                                                                                                                                                                                                           tailwindcss ^4
+6.                                                                                                                                                                                                                                                                                                                                                                           shadcnui ^2.4.1 & --all ui components
+7.                                                                                                                                                                                                                                                                                                                                                                           nuqs ^2.4.3
 
 ## 02 customizations
 
@@ -264,9 +264,33 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 - filters connected to APIs
 
+- centralized and extended query parameter parsing for product filters; added support for sorting and tags.
+
 - "Tags" collection
-  - relation with products
-  - procedure
-    - infinite load
-- sorting interface
-  - sorting connected to APIs
+
+  - many-to-many relation with products
+
+- tags filter procedure
+
+  - infinite load
+
+- sorting options interface
+  - connected to APIs
+
+## 14 product list interface
+
+- "product-list-view" component
+
+  - handles multiple components of product display
+    - supense wrapped "product-list" component
+    - integrates sorting filtering options
+  - reusable for pages of nested categories
+
+- "product-card" component
+  - product details
+  - loading placeholder
+- "product-list" modified: includes above components & hooks to work with sorting & filtering options, infinite loading, uses skeleton for loading placeholders
+- products ui loading skeleton
+- infinite loading for products
+- categary page updates
+  - "searchParams" prop for calling loading functions for product filters
