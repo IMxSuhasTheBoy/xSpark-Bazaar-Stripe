@@ -1,6 +1,7 @@
 import type { SearchParams } from "nuqs/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { DEFAULT_LIMIT } from "@/constants";
 import { trpc, getQueryClient } from "@/trpc/server";
 
 import { loadProductFilters } from "@/modules/products/search-params";
@@ -17,12 +18,13 @@ const Page = async ({ params, searchParams }: Props) => {
 
   // strategy: component for prefetching data then suspense loading in the client component (ProductList)
   const queryClient = getQueryClient();
-  
+
   // prefetch categories data server-side to leverage React Server Components for improved initial load performance
-  await queryClient.prefetchQuery(
-    trpc.products.getMany.queryOptions({
-      category,
+  await queryClient.prefetchInfiniteQuery(
+    trpc.products.getMany.infiniteQueryOptions({
       ...filters,
+      category,
+      limit: DEFAULT_LIMIT,
     }),
   );
 
