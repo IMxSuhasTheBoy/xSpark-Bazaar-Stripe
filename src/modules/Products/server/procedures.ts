@@ -2,8 +2,9 @@ import { z } from "zod";
 import { Sort, Where } from "payload";
 
 import { TRPCError } from "@trpc/server";
-import { Category } from "@/payload-types";
+import { Category, Media } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
+import { DEFAULT_LIMIT } from "@/constants";
 
 import { sortValues } from "../search-params";
 
@@ -11,20 +12,20 @@ export const productsRouter = createTRPCRouter({
   getMany: baseProcedure
     .input(
       z.object({
+        cursor: z.number().default(1),
+        limit: z.number().default(DEFAULT_LIMIT),
         category: z.string().nullable().optional(),
         minPrice: z.string().nullable().optional(),
         maxPrice: z.string().nullable().optional(),
         tags: z.array(z.string()).nullable().optional(),
         sort: z.enum(sortValues).nullable().optional(),
-        // TODO: pagination parameters
-        // page: z.number().min(1).optional(),
-        // limit: z.number().min(1).max(100).optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
       const where: Where = {};
       let sort: Sort = "-createdAt";
 
+      // sort filters
       if (input.sort === "curated") {
         sort = "-createdAt";
       }
@@ -36,6 +37,7 @@ export const productsRouter = createTRPCRouter({
       if (input.sort === "trending") {
         sort = "-createdAt";
       }
+
       // price filters
       if (input.minPrice && input.maxPrice) {
         where.price = {
@@ -112,12 +114,18 @@ export const productsRouter = createTRPCRouter({
           depth: 1, // Control relationship depth for populating category & image.
           where,
           sort,
-          // TODO: pagination parameters
-          // limit: 20,
-          // pagination: false,
+          page: input.cursor,
+          limit: input.limit,
         }); // query db
 
-        return data;
+        // typeof image is assigned as Media type individually
+        return {
+          ...data,
+          docs: data.docs.map((doc) => ({
+            ...doc,
+            image: doc.image as Media | null,
+          })),
+        };
       } catch (error) {
         console.error("Error fetching products:", error);
         throw new TRPCError({
