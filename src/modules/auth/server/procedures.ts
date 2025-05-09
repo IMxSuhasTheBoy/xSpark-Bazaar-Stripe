@@ -29,6 +29,7 @@ export const authRouter = createTRPCRouter({
           },
         },
       });
+
       const existingUser = existingData?.docs[0];
 
       if (existingUser) {
@@ -38,12 +39,22 @@ export const authRouter = createTRPCRouter({
         });
       }
 
+      const tenant = await ctx.db.create({
+        collection: "tenants",
+        data: {
+          name: input.username,
+          slug: input.username,
+          stripeAccountId: "test",
+        },
+      });
+
       await ctx.db.create({
         collection: "users",
         data: {
           email: input.email,
           password: input.password,
           username: input.username,
+          tenants: [{ tenant: tenant.id }],
         },
       });
 
