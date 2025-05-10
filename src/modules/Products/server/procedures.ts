@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Sort, Where } from "payload";
 
 import { TRPCError } from "@trpc/server";
-import { Category, Media } from "@/payload-types";
+import { Category, Media, Tenant } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { DEFAULT_LIMIT } from "@/constants";
 
@@ -19,6 +19,7 @@ export const productsRouter = createTRPCRouter({
         maxPrice: z.string().nullable().optional(),
         tags: z.array(z.string()).nullable().optional(),
         sort: z.enum(sortValues).nullable().optional(),
+        tenantSlug: z.string().nullable().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -51,6 +52,13 @@ export const productsRouter = createTRPCRouter({
       } else if (input.maxPrice) {
         where.price = {
           less_than_equal: input.maxPrice,
+        };
+      }
+
+      // tenant filters (query by a tenant)
+      if (input.tenantSlug) {
+        where["tenant.slug"] = {
+          equals: input.tenantSlug,
         };
       }
 
@@ -111,19 +119,21 @@ export const productsRouter = createTRPCRouter({
       try {
         const data = await ctx.db.find({
           collection: "products",
-          depth: 1, // Control relationship depth for populating category & image.
+          depth: 2, // Control relationship depth for populating "category", "image", "tenant" & "tenant.image".
           where,
           sort,
           page: input.cursor,
           limit: input.limit,
         }); // query db
 
+        console.log(JSON.stringify(data.docs, null, 2));
         // typeof image is assigned as Media type individually
         return {
           ...data,
           docs: data.docs.map((doc) => ({
             ...doc,
             image: doc.image as Media | null,
+            tenant: doc.tenant as Tenant & { image: Media | null },
           })),
         };
       } catch (error) {

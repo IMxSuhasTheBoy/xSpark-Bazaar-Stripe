@@ -1,11 +1,10 @@
-import { sortValues } from "@/modules/products/search-params";
-
 import {
   useQueryStates,
   parseAsString,
   parseAsArrayOf,
   parseAsStringLiteral,
 } from "nuqs";
+import { sortValues } from "../search-params";
 
 const params = {
   sort: parseAsStringLiteral(sortValues).withDefault("curated"),

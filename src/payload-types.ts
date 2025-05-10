@@ -165,7 +165,7 @@ export interface Tenant {
    */
   slug: string;
   /**
-   * This is the image for the store you are creating.)
+   * This is the image for the store you are creating.
    */
   image?: (string | null) | Media;
   stripeAccountId: string;
