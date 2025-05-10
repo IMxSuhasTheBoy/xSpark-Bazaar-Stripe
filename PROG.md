@@ -110,14 +110,14 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 01 getting started env setup
 
-1.                                                                                                                                                                                                                                                                                                                                                                                                                                   runtime & pkg manager : bun.js
-2.                                                                                                                                                                                                                                                                                                                                                                                                                                   npm i === bun add - npx === bunx
-3.                                                                                                                                                                                                                                                                                                                                                                                                                                   nextjs ^15.3.0 project setup
-4.                                                                                                                                                                                                                                                                                                                                                                                                                                   typescript ^5
-5.                                                                                                                                                                                                                                                                                                                                                                                                                                   tailwindcss ^4
-6.                                                                                                                                                                                                                                                                                                                                                                                                                                   shadcnui ^2.4.1 & --all ui components
-7.                                                                                                                                                                                                                                                                                                                                                                                                                                   nuqs ^2.4.3
-8.                                                                                                                                                                                                                                                                                                                                                                                                                                   payloadcms/plugin-multi-tenant ^2.4.3
+1.                                                                                                                                                                                                                                                                                                                                                                                                                                                  runtime & pkg manager : bun.js
+2.                                                                                                                                                                                                                                                                                                                                                                                                                                                  npm i === bun add - npx === bunx
+3.                                                                                                                                                                                                                                                                                                                                                                                                                                                  nextjs ^15.3.0 project setup
+4.                                                                                                                                                                                                                                                                                                                                                                                                                                                  typescript ^5
+5.                                                                                                                                                                                                                                                                                                                                                                                                                                                  tailwindcss ^4
+6.                                                                                                                                                                                                                                                                                                                                                                                                                                                  shadcnui ^2.4.1 & --all ui components
+7.                                                                                                                                                                                                                                                                                                                                                                                                                                                  nuqs ^2.4.3
+8.                                                                                                                                                                                                                                                                                                                                                                                                                                                  payloadcms/plugin-multi-tenant ^2.4.3
 
 ## 02 customizations
 
@@ -313,16 +313,41 @@ Primary Tagline: "Where Global Commerce Sparks Innovation"
 
 ## 15 multi tenant support
 
-    goal: each product to be able to belong to a tenant with payload plugin for multi-tenant support within admin panel
+    goal: each product and user to be able to be associated with specific tenant. Integrated with payload plugin for multi-tenant support within admin panel.
 
 - "Tenants" collection
 - "User" collection updates
   - roles field
-  - tenant management integration
+  - integrated multi-tenant field from the plugin
   - creates tenant on user registration
 - "multi tenant" plugin configuration
 - "Products" collection connected to tenant
   - each product will belong to a tenant
+  - added a new Tenants management interface and integrated tenant selection in the admin UI
 - registeration procedure updates
+
   - creates tenant using username first returns tenant id
   - with user data including tenant id, automatically assosiates new user with the tenant
+
+- product listing page refactors
+
+  - switched data prefetching from standard to infinite queries
+  - updated query options to support pagination
+  - included a default limit parameter
+
+- home page refactors
+
+  - updated to an async server component to render all products in categories at once using ProductListView component similar to category pages
+
+- seed file refactors
+  - updated seeding to create an admin tenant and super-admin user before seeding categories
+
+## 16 tenant pages
+
+- load tenant data into "product-card"
+
+- "tenantSlug" filter to products "getMany" procedure (query by a individual tenant)
+
+- tenant page
+  - internal route: /tenant/[slug]
+  - strategy: internal route converts to [slug].example-domain.com

@@ -15,6 +15,7 @@ import { Categories } from "./collections/Categories";
 import { Products } from "./collections/Products";
 import { Tags } from "./collections/Tags";
 import { Tenants } from "./collections/Tenants";
+import { Config } from "./payload-types";
 
 function validateEnv() {
   const required = ["DATABASE_URI", "PAYLOAD_SECRET"];
@@ -63,7 +64,7 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
-    multiTenantPlugin({
+    multiTenantPlugin<Config>({
       collections: {
         products: {},
       },

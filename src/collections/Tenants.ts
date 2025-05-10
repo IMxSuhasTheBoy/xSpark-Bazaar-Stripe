@@ -33,7 +33,7 @@ export const Tenants: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       admin: {
-        description: "This is the image for the store you are creating.)",
+        description: "This is the image for the store you are creating.",
       },
     },
     {
