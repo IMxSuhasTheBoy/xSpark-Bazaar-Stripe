@@ -9,6 +9,27 @@ import { DEFAULT_LIMIT } from "@/constants";
 import { sortValues } from "../search-params";
 
 export const productsRouter = createTRPCRouter({
+  getOne: baseProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const product = await ctx.db.findByID({
+        collection: "products",
+        id: input.id,
+        depth: 2, // "product.image", "product.tenant", "product.tenant.image" and"product.tenant.cover"
+      });
+
+      return {
+        ...product,
+        image: product.image as Media | null,
+        cover: product.cover as Media | null,
+        tenant: product.tenant as Tenant & { image: Media | null },
+      };
+    }),
+
   getMany: baseProcedure
     .input(
       z.object({
@@ -75,8 +96,6 @@ export const productsRouter = createTRPCRouter({
           },
         });
 
-        // console.log(JSON.stringify(categoriesData, null, 2)); test
-
         const formattedData = categoriesData.docs.map((doc) => ({
           ...doc,
           subcategories: (doc.subcategories?.docs ?? []).map((subDoc) => ({
@@ -88,14 +107,6 @@ export const productsRouter = createTRPCRouter({
 
         const subcategoriesSlugs = [];
         const parentCategory = formattedData[0];
-
-        // if (!parentCategory) {
-        //   // Handle the case when no category matches the provided slug
-        //   throw new TRPCError({
-        //     code: "NOT_FOUND",
-        //     message: `Category with slug "${input.category}" not found`,
-        //   });
-        // }
 
         if (parentCategory) {
           subcategoriesSlugs.push(
@@ -126,7 +137,6 @@ export const productsRouter = createTRPCRouter({
           limit: input.limit,
         }); // query db
 
-        console.log(JSON.stringify(data.docs, null, 2));
         // typeof image is assigned as Media type individually
         return {
           ...data,
