@@ -19,14 +19,20 @@ export const Navbar = ({ slug }: Props) => {
   return (
     <nav className="h-20 border-b bg-white font-medium">
       <div className="mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 lg:px-12">
-        <Link href={generateTenantURL(slug)} className="flex items-center gap-2">
+        <Link
+          href={generateTenantURL(slug)}
+          className="flex items-center gap-2"
+        >
           {data.image?.url && (
             <Image
               src={data.image.url}
               alt={slug}
               width={32}
               height={32}
+              loading="eager"
+              placeholder="blur"
               className="size-[32px] shrink-0 rounded-full border"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=="
             />
           )}
           <p className="text-xl">{data.name}</p>
