@@ -8,7 +8,7 @@ interface Props {
   params: Promise<{ productId: string; slug: string }>;
 }
 
-const page = async ({ params }: Props) => {
+const Page = async ({ params }: Props) => {
   const { productId, slug } = await params;
 
   const queryClient = getQueryClient();
@@ -26,4 +26,4 @@ const page = async ({ params }: Props) => {
   );
 };
 
-export default page;
+export default Page;
