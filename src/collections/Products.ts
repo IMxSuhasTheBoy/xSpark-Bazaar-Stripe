@@ -41,6 +41,9 @@ export const Products: CollectionConfig = {
       name: "cover",
       type: "upload",
       relationTo: "media",
+      admin: {
+        description: "Cover image for product detail page (larger view)",
+      },
     },
     {
       name: "refundPolicy",

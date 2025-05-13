@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Fragment } from "react";
+import dynamic from "next/dynamic";
 import { LinkIcon, StarIcon } from "lucide-react";
 
 import { useTRPC } from "@/trpc/client";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { formatCurrency, generateTenantURL } from "@/lib/utils";
@@ -13,6 +15,18 @@ import { formatCurrency, generateTenantURL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/star-rating";
 import { Progress } from "@/components/ui/progress";
+
+const CartButton = dynamic(
+  () => import("../components/cart-button").then((mod) => mod.CartButton),
+  {
+    ssr: false,
+    loading: () => (
+      <Button disabled className="flex-1 bg-amber-400">
+        Add to cart
+      </Button>
+    ),
+  },
+);
 
 interface ProductViewProps {
   productId: string;
@@ -37,11 +51,13 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
             className="object-cover"
           />
         </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-6">
           <div className="col-span-4">
             <div className="p-6">
               <h1 className="text-4xl font-medium">{data.name}</h1>
             </div>
+
             <div className="flex border-y">
               <div className="flex items-center justify-center border-r px-6 py-4">
                 <div className="w-fit border bg-amber-400 px-2 py-1">
@@ -100,9 +116,7 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
             <div className="h-full border-t lg:border-t-0 lg:border-l">
               <div className="flex flex-col gap-4 border-b p-6">
                 <div className="flex flex-row items-center gap-2">
-                  <Button variant="elevated" className="flex-1 bg-amber-400">
-                    Add to cart
-                  </Button>
+                  <CartButton tenantSlug={tenantSlug} productId={productId} />
                   <Button
                     className="size-12"
                     variant="elevated"
@@ -129,6 +143,7 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                     <p className="text-base">{5} ratings</p>
                   </div>
                 </div>
+
                 <div className="mt-4 grid grid-cols-[auto_1fr_auto] gap-3">
                   {[5, 4, 3, 2, 1].map((stars) => (
                     <Fragment key={stars}>
@@ -136,7 +151,7 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                         {stars} {stars === 1 ? "star" : "stars"}
                       </div>
                       <Progress value={25} className="h-[1lh]" />
-                      <div className="font-medium">{2}%</div>
+                      <div className="font-medium">{25}%</div>
                     </Fragment>
                   ))}
                 </div>
