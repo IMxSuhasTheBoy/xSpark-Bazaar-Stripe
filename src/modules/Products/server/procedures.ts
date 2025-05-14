@@ -18,8 +18,8 @@ export const productsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const product = await ctx.db.findByID({
         collection: "products",
+        depth: 2, // "product.image", "product.cover", "product.tenant", "product.tenant.image" and"product.tenant.cover"
         id: input.id,
-        depth: 2, // "product.image", "product.tenant", "product.tenant.image" and"product.tenant.cover"
       });
 
       return {
@@ -53,11 +53,11 @@ export const productsRouter = createTRPCRouter({
       }
 
       if (input.sort === "new") {
-        sort = "+createdAt";
+        sort = "-createdAt";
       }
 
       if (input.sort === "trending") {
-        sort = "-createdAt";
+        sort = "+createdAt";
       }
 
       // price filters
@@ -143,11 +143,12 @@ export const productsRouter = createTRPCRouter({
           docs: data.docs.map((doc) => ({
             ...doc,
             image: doc.image as Media | null,
+            cover: doc.cover as Media | null,
             tenant: doc.tenant as Tenant & { image: Media | null },
           })),
         };
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching products: productsRouter", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to fetch products",

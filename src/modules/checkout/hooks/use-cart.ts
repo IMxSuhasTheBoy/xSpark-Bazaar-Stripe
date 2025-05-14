@@ -12,7 +12,7 @@ export const useCart = (tenantSlug: string) => {
   // get id of all products of the tenant
   const productIds = getCartByTenant(tenantSlug);
 
-  // adds or romoves the product by product id conditionaly
+  // adds or romoves the product by product id conditionally
   const toggleProduct = (productId: string) => {
     if (productIds.includes(productId)) {
       removeProduct(tenantSlug, productId);
