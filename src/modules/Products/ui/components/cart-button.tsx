@@ -19,7 +19,7 @@ export const CartButton = ({ tenantSlug, productId }: Props) => {
       )}
       onClick={() => cart.toggleProduct(productId)}
     >
-      {cart.isProductInCart(productId) ? "Remove form cart" : "Add to cart"}
+      {cart.isProductInCart(productId) ? "Remove from cart" : "Add to cart"}
     </Button>
   );
 };
