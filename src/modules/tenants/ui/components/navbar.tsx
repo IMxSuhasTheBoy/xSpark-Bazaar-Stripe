@@ -4,13 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ShoppingCartIcon } from "lucide-react";
-
 import { useSuspenseQuery } from "@tanstack/react-query";
-
-import { generateTenantURL } from "@/lib/utils";
 
 import { useTRPC } from "@/trpc/client";
 
+import { generateTenantURL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const CheckoutButton = dynamic(
@@ -22,7 +20,7 @@ const CheckoutButton = dynamic(
     ssr: false,
     loading: () => (
       <Button disabled className="bg-white">
-        <ShoppingCartIcon  className="text-black" />
+        <ShoppingCartIcon className="text-black" />
       </Button>
     ),
   },

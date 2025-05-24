@@ -16,6 +16,7 @@ import { Products } from "./collections/Products";
 import { Tags } from "./collections/Tags";
 import { Tenants } from "./collections/Tenants";
 import { Config } from "./payload-types";
+import { Orders } from "./collections/Orders";
 
 function validateEnv() {
   const required = ["DATABASE_URI", "PAYLOAD_SECRET"];
@@ -44,7 +45,7 @@ export default buildConfig({
     },
   },
   // Define and configure your collections in this array
-  collections: [Users, Media, Categories, Products, Tags, Tenants],
+  collections: [Users, Media, Categories, Products, Tags, Tenants, Orders],
   editor: lexicalEditor(),
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || "",

@@ -7,10 +7,11 @@ import { useForm } from "react-hook-form";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
 
-import { cn } from "@/lib/utils";
-import { useTRPC } from "@/trpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { cn } from "@/lib/utils";
+import { useTRPC } from "@/trpc/client";
 
 import {
   Form,
@@ -175,9 +176,7 @@ export const SignUpView = () => {
                     <Input {...field} type="password" />
                   </FormControl>
                   {passwordsMatch && confirmPassword && (
-                    <p className="mt-1 text-sm text-green-600">
-                      ✔
-                    </p>
+                    <p className="mt-1 text-sm text-green-600">✔</p>
                   )}
 
                   <FormMessage />

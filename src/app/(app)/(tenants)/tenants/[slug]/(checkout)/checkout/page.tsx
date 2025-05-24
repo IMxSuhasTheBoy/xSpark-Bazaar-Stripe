@@ -4,6 +4,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// current tentant
 const Page = async ({ params }: PageProps) => {
   const { slug } = await params;
 

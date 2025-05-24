@@ -5,23 +5,20 @@ import Image from "next/image";
 import { Fragment } from "react";
 import dynamic from "next/dynamic";
 import { LinkIcon, StarIcon } from "lucide-react";
-
-import { useTRPC } from "@/trpc/client";
-
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { formatCurrency, generateTenantURL } from "@/lib/utils";
-
+import { useTRPC } from "@/trpc/client";
 import { Button } from "@/components/ui/button";
-import { StarRating } from "@/components/star-rating";
 import { Progress } from "@/components/ui/progress";
+import { StarRating } from "@/components/star-rating";
+import { formatCurrency, generateTenantURL } from "@/lib/utils";
 
 const CartButton = dynamic(
   () => import("../components/cart-button").then((mod) => mod.CartButton),
   {
     ssr: false,
     loading: () => (
-      <Button disabled className="flex-1 bg-amber-400">
+      <Button disabled className="flex-1 bg-amber-400" aria-busy="true">
         Add to cart
       </Button>
     ),
@@ -35,6 +32,7 @@ interface ProductViewProps {
 
 export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
   const trpc = useTRPC();
+
 
   const { data } = useSuspenseQuery(
     trpc.products.getOne.queryOptions({ id: productId }),
@@ -116,7 +114,11 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
             <div className="h-full border-t lg:border-t-0 lg:border-l">
               <div className="flex flex-col gap-4 border-b p-6">
                 <div className="flex flex-row items-center gap-2">
-                  <CartButton tenantSlug={tenantSlug} productId={productId} />
+                  <CartButton
+                    tenantSlug={tenantSlug}
+                    productId={productId}
+                    isPurchased={data.isPurchased}
+                  />
                   <Button
                     className="size-12"
                     variant="elevated"
