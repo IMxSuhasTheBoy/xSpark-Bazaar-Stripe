@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { generateTenantURL } from "@/lib/utils";
-
 import { Button } from "@/components/ui/button";
 
 interface Props {

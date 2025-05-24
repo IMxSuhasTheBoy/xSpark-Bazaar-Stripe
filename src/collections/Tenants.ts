@@ -37,20 +37,20 @@ export const Tenants: CollectionConfig = {
       },
     },
     {
-      name: "stripeAccountId",
+      name: "razorpayAccountId",
       type: "text",
-      required: true,
+      required: false,
       admin: {
         readOnly: true,
       },
     },
     {
-      name: "stripeDetailsSubmitted",
+      name: "razorpayDetailsSubmitted",
       type: "checkbox",
       admin: {
         readOnly: true,
         description:
-          "You cannot create products until you have submitted your Stripe details.",
+          "You cannot create products until you have submitted your Razorpay details.",
       },
     },
   ],

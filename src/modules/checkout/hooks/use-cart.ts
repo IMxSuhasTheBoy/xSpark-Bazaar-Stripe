@@ -1,38 +1,58 @@
+import { useCallback } from "react";
+import { useShallow } from "zustand/react/shallow";
+
 import { useCartStore } from "../store/use-cart-store";
 
 export const useCart = (tenantSlug: string) => {
-  const {
-    getCartByTenant,
-    addProduct,
-    removeProduct,
-    clearCart,
-    clearAllCarts,
-  } = useCartStore();
+  // Selectors for cart actions to avoid unnecessary re-renders
+  const addProduct = useCartStore((state) => state.addProduct);
+  const removeProduct = useCartStore((state) => state.removeProduct);
+  const clearCart = useCartStore((state) => state.clearCart);
+  const clearAllCarts = useCartStore((state) => state.clearAllCarts);
 
-  // get id of all products of the tenant
-  const productIds = getCartByTenant(tenantSlug);
+  // Get the product IDs for the current tenant's cart
+  const productIds = useCartStore(
+    useShallow((state) => state.tenantCarts[tenantSlug]?.productIds || []),
+  );
 
-  // adds or romoves the product by product id conditionally
-  const toggleProduct = (productId: string) => {
-    if (productIds.includes(productId)) {
-      removeProduct(tenantSlug, productId);
-    } else {
-      addProduct(tenantSlug, productId);
-    }
-  };
+  const toggleProduct = useCallback(
+    (productId: string) => {
+      if (productIds.includes(productId)) {
+        removeProduct(tenantSlug, productId);
+      } else {
+        addProduct(tenantSlug, productId);
+      }
+    },
+    [productIds, tenantSlug, addProduct, removeProduct],
+  );
 
-  const isProductInCart = (productId: string) => {
-    return productIds.includes(productId);
-  };
+  const isProductInCart = useCallback(
+    (productId: string) => productIds.includes(productId),
+    [productIds],
+  );
 
-  const clearTenantCart = () => {
+  const clearTenantCart = useCallback(() => {
     clearCart(tenantSlug);
-  };
+  }, [tenantSlug, clearCart]);
+
+  const handleAddProduct = useCallback(
+    (productId: string) => {
+      addProduct(tenantSlug, productId);
+    },
+    [addProduct, tenantSlug],
+  );
+
+  const handleRemoveProduct = useCallback(
+    (productId: string) => {
+      removeProduct(tenantSlug, productId);
+    },
+    [removeProduct, tenantSlug],
+  );
 
   return {
     productIds,
-    addProduct: (productId: string) => addProduct(tenantSlug, productId),
-    removeProduct: (productId: string) => removeProduct(tenantSlug, productId),
+    addProduct: handleAddProduct,
+    removeProduct: handleRemoveProduct,
     clearCart: clearTenantCart,
     clearAllCarts,
     toggleProduct,

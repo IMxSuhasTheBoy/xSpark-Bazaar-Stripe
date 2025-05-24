@@ -1,19 +1,22 @@
-import { Button } from "@/components/ui/button";
+import { CircleIcon, AlertTriangleIcon } from "lucide-react";
+
 import { formatCurrency } from "@/lib/utils";
-import { CircleIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface CheckoutSidebarProps {
   total: number;
-  onCheckout: () => void;
+  onPurchase: () => void;
   isCanceled?: boolean;
-  isPending?: boolean;
+  disabled?: boolean;
+  hasMissingProducts?: boolean;
 }
 
 export const CheckoutSidebar = ({
   total,
-  onCheckout,
+  onPurchase,
   isCanceled,
-  isPending,
+  disabled,
+  hasMissingProducts,
 }: CheckoutSidebarProps) => {
   return (
     <div className="flex flex-col overflow-hidden rounded-md border bg-white">
@@ -25,21 +28,39 @@ export const CheckoutSidebar = ({
       <div className="flex items-center justify-center p-4">
         <Button
           variant="elevated"
-          disabled={isPending}
-          onClick={onCheckout}
+          onClick={onPurchase}
+          disabled={disabled || hasMissingProducts}
           size="lg"
-          className="bg-primary hover:text-primary w-full text-base text-white hover:bg-amber-400"
+          className="bg-primary w-full text-base text-white hover:bg-amber-400"
         >
-          Checkout
+          {hasMissingProducts
+            ? "Remove Unavailable Items to Continue"
+            : isCanceled
+              ? "Try Payment Again"
+              : "Checkout Now"}
         </Button>
       </div>
+
+      {hasMissingProducts && (
+        <div className="flex items-center justify-center border-t p-4">
+          <div className="flex w-full items-center rounded border border-amber-400 bg-amber-100 px-4 py-3 font-medium">
+            <div className="flex items-center">
+              <AlertTriangleIcon className="mr-2 size-6 text-amber-500" />
+              <span>Some items in your cart are no longer available</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isCanceled && (
         <div className="flex items-center justify-center border-t p-4">
           <div className="flex w-full items-center rounded border border-red-400 bg-red-100 px-4 py-3 font-medium">
             <div className="flex items-center">
               <CircleIcon className="mr-2 size-6 fill-red-500 text-red-100" />
-              <span>Checkout failed. Please try again.</span>
+              <span>
+                Checkout failed. Previous payment was cancelled please try
+                again.
+              </span>
             </div>
           </div>
         </div>
