@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
 
-    if (error! instanceof Error) {
+    if (!(error instanceof Error)) {
       console.log(error);
     }
 
@@ -42,13 +42,24 @@ export async function POST(req: Request) {
     );
   }
 
-  const event = JSON.parse(body);
-  console.log("Razorpay webhook event:", event);
+  let event;
+  try {
+    event = JSON.parse(body);
+    console.log("Razorpay webhook event:", event);
+  } catch (error) {
+    console.error("Failed to parse webhook body:", error);
+    return NextResponse.json(
+      { message: "Invalid webhook payload" },
+      { status: 400 },
+    );
+  }
 
+  /* implement if needed
   const permittedEvents: string[] = ["payment.captured"];
-
+  
   if (permittedEvents.includes(event.event)) {
   }
+  */
   if (event.event === "payment.captured") {
     const payment = event.payload.payment.entity;
     const notes = payment.notes || {};
@@ -63,9 +74,7 @@ export async function POST(req: Request) {
     const payload = await getPayload({ config });
 
     // Validate user exists
-    const user = await (
-      await getPayload({ config })
-    ).findByID({
+    const user = await payload.findByID({
       collection: "users",
       id: userId,
     });
@@ -118,7 +127,7 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ message: "Recieved" }, { status: 200 });
+  return NextResponse.json({ message: "Received" }, { status: 200 });
 }
 
 // else {
