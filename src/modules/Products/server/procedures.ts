@@ -4,9 +4,9 @@ import { headers as getHeaders } from "next/headers";
 
 import { TRPCError } from "@trpc/server";
 
+import { DEFAULT_LIMIT } from "@/constants";
 import { Category, Media, Tenant } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
-import { DEFAULT_LIMIT } from "@/constants";
 
 import { sortValues } from "../search-params";
 
@@ -19,15 +19,21 @@ export const productsRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const headers = await getHeaders();
-      const session = await ctx.db.auth({
-        headers,
-      });
+      let session;
+      try {
+        session = await ctx.db.auth({
+          headers,
+        });
+      } catch {
+        session = { user: null };
+      }
 
       const product = await ctx.db.findByID({
         collection: "products",
         depth: 2, // "product.image", "product.cover", "product.tenant", "product.tenant.image" and"product.tenant.cover"
         id: input.id,
       });
+
       let isPurchased = false;
 
       if (session.user) {

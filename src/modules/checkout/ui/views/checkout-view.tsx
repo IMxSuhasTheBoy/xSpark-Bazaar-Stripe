@@ -1,11 +1,17 @@
 "use client";
 
+declare global {
+  interface Window {
+    Razorpay: Razorpay;
+  }
+}
+
 import { toast } from "sonner";
 import Script from "next/script";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { InboxIcon, LoaderIcon } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
 import { generateTenantURL } from "@/lib/utils";
@@ -27,6 +33,7 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
   // const [dialogOpen, setDialogOpen] = useState(false);
 
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery(
     trpc.checkout.getProducts.queryOptions({
@@ -155,10 +162,19 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
           },
 
           handler: function () {
-            setStates({ success: true, cancel: false });
-            toast.success(
-              "Payment processing. You will be notified once complete.",
-            );
+            try {
+              toast.success("Payment successful!");
+              setStates({ success: true, cancel: false });
+              clearCart();
+              queryClient.invalidateQueries(
+                trpc.library.getMany.infiniteQueryFilter(),
+              );
+              window.location.href = "/library"; // More reliable navigation after payment
+              // router.push("/products");
+              setStates({ success: false, cancel: false }); // check for any issues
+            } catch {
+              toast.error("Error processing payment. Please contact support.");
+            }
           },
           modal: {
             ondismiss: function () {
@@ -170,7 +186,6 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
           },
           theme: { color: "#FBBF24" },
         };
-        // @ts-expect-error: global window.Razorpay object injected by the Razorpay JS SDK.
         const rzp = new window.Razorpay(options);
         rzp.open();
       },
@@ -191,19 +206,22 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
     toast.info("Payment was cancelled. You can try again.");
   }, [states.cancel]);
 
-  // Add this success effect handler after the cancel effect
-  useEffect(() => {
-    if (states.success) {
-      // setStates  ceckk if requied 
-      clearCart(); // Clear cart after successful payment
-      router.push("/products");
-      toast.success("Payment successful!");
-    }
-  }, [states.success, clearCart, router]);
-
-  const handlePurchase = () => {
-    purchase.mutate({ tenantSlug, productIds });
-  };
+  // useEffect(() => {
+  //   if (states.success) {
+  //     setStates({ success: false, cancel: false }); // check if requied. checked After pr #22 probably required. still getting max depth err
+  //     clearCart(); // Clear cart after successful payment
+  //     queryClient.invalidateQueries(trpc.library.getMany.infiniteQueryFilter());
+  //     toast.success("Payment successful!");
+  //     router.push("/library");
+  //   }
+  // }, [
+  //   states.success,
+  //   clearCart,
+  //   router,
+  //   setStates,
+  //   queryClient,
+  //   trpc.library.getMany,
+  // ]);
 
   if (isLoading) {
     return (
@@ -266,7 +284,7 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
           <div className="lg:col-span-3">
             <CheckoutSidebar
               total={data?.totalPrice || 0}
-              onPurchase={handlePurchase}
+              onPurchase={() => purchase.mutate({ tenantSlug, productIds })}
               isCanceled={states.cancel}
               disabled={purchase.isPending || hasMissingProducts}
               hasMissingProducts={hasMissingProducts}
@@ -285,4 +303,3 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
     </>
   );
 };
-

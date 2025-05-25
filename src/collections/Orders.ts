@@ -4,7 +4,7 @@ export const Orders: CollectionConfig = {
   slug: "orders",
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "user", "product", "paymentId"],
+    defaultColumns: ["name", "user", "product", "razorpayCheckoutSessionId"],
   },
   fields: [
     {
