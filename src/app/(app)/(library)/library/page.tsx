@@ -3,7 +3,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { DEFAULT_LIMIT } from "@/constants";
 import { trpc, getQueryClient } from "@/trpc/server";
 
-import { LibraryView } from "@/modules/library/ui/views/library-vew";
+import { LibraryView } from "@/modules/library/ui/views/library-view";
 
 const page = async () => {
   const queryClient = getQueryClient();

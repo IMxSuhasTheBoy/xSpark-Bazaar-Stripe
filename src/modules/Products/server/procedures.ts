@@ -25,6 +25,9 @@ export const productsRouter = createTRPCRouter({
           headers,
         });
       } catch {
+        console.warn(
+          "Authentication failed in products.getOne, proceeding as unauthenticated user",
+        );
         session = { user: null };
       }
 

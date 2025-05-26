@@ -162,19 +162,15 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
           },
 
           handler: function () {
-            try {
-              toast.success("Payment successful!");
-              setStates({ success: true, cancel: false });
-              clearCart();
-              queryClient.invalidateQueries(
-                trpc.library.getMany.infiniteQueryFilter(),
-              );
-              window.location.href = "/library"; // More reliable navigation after payment
-              // router.push("/products");
-              setStates({ success: false, cancel: false }); // check for any issues
-            } catch {
-              toast.error("Error processing payment. Please contact support.");
-            }
+            toast.success("Payment successful!");
+            setStates({ success: true, cancel: false });
+            clearCart();
+            queryClient.invalidateQueries(
+              trpc.library.getMany.infiniteQueryFilter(),
+            );
+            window.location.href = "/library"; // More reliable navigation after payment
+            // router.push("/products");
+            // setStates({ success: false, cancel: false }); // check for any issues
           },
           modal: {
             ondismiss: function () {
