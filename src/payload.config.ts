@@ -1,7 +1,7 @@
 import path from "path";
 import sharp from "sharp";
-import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
+import { buildConfig } from "payload";
 
 // storage-adapter-import-placeholder
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
@@ -17,6 +17,7 @@ import { Tags } from "./collections/Tags";
 import { Tenants } from "./collections/Tenants";
 import { Config } from "./payload-types";
 import { Orders } from "./collections/Orders";
+import { Reviews } from "./collections/Reviews";
 
 function validateEnv() {
   const required = ["DATABASE_URI", "PAYLOAD_SECRET"];
@@ -45,7 +46,7 @@ export default buildConfig({
     },
   },
   // Define and configure your collections in this array
-  collections: [Users, Media, Categories, Products, Tags, Tenants, Orders],
+  collections: [Users, Media, Categories, Products, Tags, Tenants, Orders, Reviews],
   editor: lexicalEditor(),
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || "",

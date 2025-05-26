@@ -81,6 +81,22 @@ export const libraryRouter = createTRPCRouter({
 
       const productIds = ordersData.docs.map((order) => order.product);
 
+      // validation for empty product IDs array. If a user has orders but no valid product IDs, the products query might behave unexpectedly.
+      if (productIds.length === 0) {
+        return {
+          docs: [],
+          totalDocs: 0,
+          limit: input.limit,
+          totalPages: 0,
+          page: input.cursor,
+          pagingCounter: input.cursor,
+          hasPrevPage: input.cursor > 1,
+          hasNextPage: false,
+          prevPage: input.cursor > 1 ? input.cursor - 1 : null,
+          nextPage: null,
+        };
+      }
+
       const productsData = await ctx.db.find({
         collection: "products",
         pagination: false,
