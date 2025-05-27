@@ -2,13 +2,15 @@ import { z } from "zod";
 import { Sort, Where } from "payload";
 import { headers as getHeaders } from "next/headers";
 
-import { TRPCError } from "@trpc/server";
-
 import { DEFAULT_LIMIT } from "@/constants";
-import { Category, Media, Tenant } from "@/payload-types";
+import { Category, Media, Review, Tenant } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 
 import { sortValues } from "../search-params";
+
+interface ReviewsByProductId {
+  [productId: string]: Review[];
+}
 
 export const productsRouter = createTRPCRouter({
   getOne: baseProcedure
@@ -63,12 +65,59 @@ export const productsRouter = createTRPCRouter({
         isPurchased = !!ordersData.docs[0];
       }
 
+      // Fetch reviews for the product to summarize them
+      const reviewsData = await ctx.db.find({
+        collection: "reviews",
+        pagination: false,
+        where: {
+          product: {
+            equals: input.id,
+          },
+        },
+      });
+
+      const reviewRating =
+        reviewsData.docs.length > 0
+          ? reviewsData.docs.reduce((acc, review) => acc + review.rating, 0) /
+            reviewsData.totalDocs
+          : 0;
+
+      const ratingDistribution: Record<number, number> = {
+        5: 0,
+        4: 0,
+        3: 0,
+        2: 0,
+        1: 0,
+      };
+
+      if (reviewsData.totalDocs > 0) {
+        reviewsData.docs.forEach((review) => {
+          const rating = review.rating;
+
+          if (rating >= 1 && rating <= 5) {
+            ratingDistribution[rating] = (ratingDistribution[rating] || 0) + 1;
+          }
+        });
+
+        // Convert the rating distribution to an array of objects
+        Object.keys(ratingDistribution).forEach((key) => {
+          const rating = Number(key);
+          const count = ratingDistribution[rating] || 0;
+          ratingDistribution[rating] = Math.round(
+            (count / reviewsData.totalDocs) * 100,
+          );
+        });
+      }
+
       return {
         ...product,
         isPurchased,
         image: product.image as Media | null,
         cover: product.cover as Media | null,
         tenant: product.tenant as Tenant & { image: Media | null },
+        reviewRating,
+        reviewCount: reviewsData.totalDocs,
+        ratingDistribution,
       };
     }),
 
@@ -136,7 +185,7 @@ export const productsRouter = createTRPCRouter({
               equals: input.category,
             },
           },
-        });
+        }); // query db
 
         const formattedData = categoriesData.docs.map((doc) => ({
           ...doc,
@@ -169,33 +218,70 @@ export const productsRouter = createTRPCRouter({
         };
       }
 
-      try {
-        const data = await ctx.db.find({
-          collection: "products",
-          depth: 2, // Control relationship depth for populating "category", "image", "tenant" & "tenant.image".
-          where,
-          sort,
-          page: input.cursor,
-          limit: input.limit,
-        }); // query db
+      const data = await ctx.db.find({
+        collection: "products",
+        depth: 2, // Control relationship depth for populating "category", "image", "tenant" & "tenant.image".
+        where,
+        sort,
+        page: input.cursor,
+        limit: input.limit,
+      }); // query db
 
-        // typeof image is assigned as Media type individually
+      // batch fetching reviews and then matching them to products in memory:
+      // fetch all reviews for all products in a single query
+      const productsIds = data.docs.map((doc) => doc.id);
+      const allReviewsData = await ctx.db.find({
+        collection: "reviews",
+        pagination: false,
+        where: {
+          product: {
+            in: productsIds,
+          },
+        },
+      }); // query db
+
+      // group reviews by product id with proper typing
+      const reviewsByProductId = allReviewsData.docs.reduce<ReviewsByProductId>(
+        (acc, review) => {
+          // product field from Review type is string | Product, we want the string (ID)
+          const productId =
+            typeof review.product === "string"
+              ? review.product
+              : review.product.id;
+          if (!acc[productId]) {
+            acc[productId] = [];
+          }
+          acc[productId].push(review);
+          return acc;
+        },
+        {},
+      );
+
+      // map product data with review summaries
+      const dataWithSummarizedReviews = data.docs.map((doc) => {
+        const productReviews = reviewsByProductId[doc.id] || [];
+        const reviewCount = productReviews.length;
+        const reviewRating =
+          reviewCount === 0
+            ? 0
+            : productReviews.reduce((acc, review) => acc + review.rating, 0) /
+              reviewCount;
         return {
-          ...data,
-          docs: data.docs.map((doc) => ({
-            ...doc,
-            image: doc.image as Media | null,
-            cover: doc.cover as Media | null,
-            tenant: doc.tenant as Tenant & { image: Media | null },
-          })),
+          ...doc,
+          reviewCount,
+          reviewRating,
         };
-      } catch (error) {
-        console.error("Error fetching products: productsRouter", error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to fetch products",
-          cause: error,
-        });
-      }
+      });
+
+      // typeof image is assigned as Media type individually
+      return {
+        ...data,
+        docs: dataWithSummarizedReviews.map((doc) => ({
+          ...doc,
+          image: doc.image as Media | null,
+          cover: doc.cover as Media | null,
+          tenant: doc.tenant as Tenant & { image: Media | null },
+        })),
+      };
     }),
 });

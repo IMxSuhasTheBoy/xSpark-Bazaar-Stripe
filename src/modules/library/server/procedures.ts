@@ -2,8 +2,12 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { DEFAULT_LIMIT } from "@/constants";
-import { Media, Tenant } from "@/payload-types";
+import { Media, Review, Tenant } from "@/payload-types";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
+
+interface ReviewsByProductId {
+  [productId: string]: Review[];
+}
 
 export const libraryRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -47,7 +51,7 @@ export const libraryRouter = createTRPCRouter({
         collection: "products",
         // depth: 2, // Control relationship depth for populating "category", "image", "tenant" & "tenant.image".
         id: input.productId,
-      });
+      }); // query db
 
       if (!product) {
         throw new TRPCError({
@@ -69,7 +73,7 @@ export const libraryRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const ordersData = await ctx.db.find({
         collection: "orders",
-        depth: 0, // Control relationship depth for just ids
+        depth: 0,
         limit: input.limit,
         page: input.cursor,
         where: {
@@ -106,11 +110,57 @@ export const libraryRouter = createTRPCRouter({
             in: productIds,
           },
         },
+      }); // query db
+
+      // batch fetching reviews and then matching them to products in memory:
+      // fetch all reviews for all products in a single query
+      const productsIds = productsData.docs.map((doc) => doc.id);
+      const allReviewsData = await ctx.db.find({
+        collection: "reviews",
+        pagination: false,
+        where: {
+          product: {
+            in: productsIds,
+          },
+        },
+      }); // query db
+
+      // group reviews by product id with proper typing
+      const reviewsByProductId = allReviewsData.docs.reduce<ReviewsByProductId>(
+        (acc, review) => {
+          // product field from Review type is string | Product, we want the string (ID)
+          const productId =
+            typeof review.product === "string"
+              ? review.product
+              : review.product.id;
+          if (!acc[productId]) {
+            acc[productId] = [];
+          }
+          acc[productId].push(review);
+          return acc;
+        },
+        {},
+      );
+
+      // map product data with review summaries
+      const dataWithSummarizedReviews = productsData.docs.map((doc) => {
+        const productReviews = reviewsByProductId[doc.id] || [];
+        const reviewCount = productReviews.length;
+        const reviewRating =
+          reviewCount === 0
+            ? 0
+            : productReviews.reduce((acc, review) => acc + review.rating, 0) /
+              reviewCount;
+        return {
+          ...doc,
+          reviewCount,
+          reviewRating,
+        };
       });
 
       return {
         ...productsData,
-        docs: productsData.docs.map((doc) => ({
+        docs: dataWithSummarizedReviews.map((doc) => ({
           ...doc,
           image: doc.image as Media | null,
           cover: doc.cover as Media | null,
@@ -119,3 +169,33 @@ export const libraryRouter = createTRPCRouter({
       };
     }),
 });
+
+/*
+ const dataWithSummarizedReviews = await Promise.all(
+        productsData.docs.map(async (doc) => {
+          // Fetch reviews for each product to summarize them
+          const reviewsData = await ctx.db.find({
+            collection: "reviews",
+            pagination: false,
+            where: {
+              product: {
+                equals: doc.id,
+              },
+            },
+          });
+
+          return {
+            ...doc,
+            reviewCount: reviewsData.totalDocs,
+            reviewRating:
+              reviewsData.docs.length === 0
+                ? 0
+                : reviewsData.docs.reduce(
+                    (acc, review) => acc + review.rating,
+                    0,
+                  ) / reviewsData.totalDocs,
+          };
+        }),
+      );
+
+*/

@@ -44,6 +44,9 @@ export const ProductCard = ({
             src={imageUrl || "/placeholder.png"}
             fill
             className="object-cover"
+            onError={(e) => {
+              e.currentTarget.src = "/placeholder.png";
+            }}
           />
         </div>
         <div className="flex flex-1 flex-col gap-3 border-y p-4">

@@ -153,7 +153,6 @@ export const ReviewForm = ({ productId, initialData }: Props) => {
           onClick={() => setIsPreview(false)}
           type="button"
           size="lg"
-          disabled={false}
           variant="elevated"
           className="mt-4 w-fit"
         >

@@ -2,16 +2,16 @@
 
 import { InboxIcon } from "lucide-react";
 
-import { useTRPC } from "@/trpc/client";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
-import { DEFAULT_LIMIT } from "@/constants";
+import { useTRPC } from "@/trpc/client";
 
+import { cn } from "@/lib/utils";
+import { DEFAULT_LIMIT } from "@/constants";
 import { Button } from "@/components/ui/button";
 
 import { ProductCard, ProductCardSkeleton } from "./product-card";
 import { useProductFilters } from "../../hooks/use-product-filters";
-import { cn } from "@/lib/utils";
 
 interface Props {
   category?: string;
@@ -77,8 +77,8 @@ export const ProductList = ({ category, tenantSlug, narrowView }: Props) => {
               tenantImageUrl={product.tenant?.image?.url}
               imageUrl={product.image?.url}
               price={product.price}
-              reviewCount={5}
-              reviewRating={3}
+              reviewCount={product.reviewCount}
+              reviewRating={product.reviewRating}
             />
           ))}
       </div>
