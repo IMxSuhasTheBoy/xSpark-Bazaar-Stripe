@@ -6,6 +6,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
+
 import { ReviewSidebar } from "../components/review-sidebar";
 
 interface Props {
@@ -40,9 +41,13 @@ export const ProductView = ({ productId }: Props) => {
           </div>
 
           <div className="lg:col-span-5">
-            <p className="text-muted-foreground font-medium italic">
-              No specific content
-            </p>
+            {data.content ? (
+              <p> {data.content}</p>
+            ) : (
+              <p className="text-muted-foreground font-medium italic">
+                No specific content
+              </p>
+            )}
           </div>
         </div>
       </section>

@@ -32,13 +32,13 @@ interface ProductViewProps {
 }
 
 export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
+  const [isCopied, setIsCopied] = useState(false);
+
   const trpc = useTRPC();
 
   const { data } = useSuspenseQuery(
     trpc.products.getOne.queryOptions({ id: productId }),
   );
-
-  const [isCopied, setIsCopied] = useState(false);
 
   return (
     <div className="px-4 py-10 lg:px-12">
@@ -146,7 +146,7 @@ export const ProductView = ({ productId, tenantSlug }: ProductViewProps) => {
                     disabled={isCopied}
                     aria-label="Copy product link"
                     title="Copy product link"
-                    aria-busy={isCopied}
+                    aria-pressed={isCopied}
                   >
                     {isCopied ? <CheckIcon /> : <LinkIcon />}
                   </Button>

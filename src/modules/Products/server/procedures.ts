@@ -37,6 +37,9 @@ export const productsRouter = createTRPCRouter({
         collection: "products",
         depth: 2, // "product.image", "product.cover", "product.tenant", "product.tenant.image" and"product.tenant.cover"
         id: input.id,
+        select: {
+          content: false, // do not fetch content field
+        },
       });
 
       let isPurchased = false;
@@ -79,7 +82,7 @@ export const productsRouter = createTRPCRouter({
       const reviewRating =
         reviewsData.docs.length > 0
           ? reviewsData.docs.reduce((acc, review) => acc + review.rating, 0) /
-            reviewsData.totalDocs
+            reviewsData.docs.length
           : 0;
 
       const ratingDistribution: Record<number, number> = {
@@ -104,7 +107,7 @@ export const productsRouter = createTRPCRouter({
           const rating = Number(key);
           const count = ratingDistribution[rating] || 0;
           ratingDistribution[rating] = Math.round(
-            (count / reviewsData.totalDocs) * 100,
+            (count / reviewsData.docs.length) * 100,
           );
         });
       }
@@ -225,6 +228,9 @@ export const productsRouter = createTRPCRouter({
         sort,
         page: input.cursor,
         limit: input.limit,
+        select: {
+          content: false, // do not fetch content field
+        },
       }); // query db
 
       // batch fetching reviews and then matching them to products in memory:
@@ -261,11 +267,13 @@ export const productsRouter = createTRPCRouter({
       const dataWithSummarizedReviews = data.docs.map((doc) => {
         const productReviews = reviewsByProductId[doc.id] || [];
         const reviewCount = productReviews.length;
-        const reviewRating =
+        const rawAverage =
           reviewCount === 0
             ? 0
             : productReviews.reduce((acc, review) => acc + review.rating, 0) /
               reviewCount;
+        const reviewRating = Math.round(rawAverage * 100) / 100; // round to two decimal places
+
         return {
           ...doc,
           reviewCount,
