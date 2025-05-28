@@ -33,6 +33,8 @@ export const StarPicker = ({
           key={star}
           type="button"
           disabled={disabled}
+          aria-label={`Rate ${star} out of 5 stars`}
+          aria-pressed={value === star}
           className={cn(
             "p-0.5 transition hover:scale-110",
             !disabled && "cursor-pointer",

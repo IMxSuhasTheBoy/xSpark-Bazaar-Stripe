@@ -121,7 +121,7 @@ export const reviewsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const existingReview = await ctx.db.findByID({
-        depth: 0, // exsistingReview.user will be the user ID
+        depth: 0, // existingReview.user will be the user ID
         collection: "reviews",
         id: input.reviewId,
       }); // query db

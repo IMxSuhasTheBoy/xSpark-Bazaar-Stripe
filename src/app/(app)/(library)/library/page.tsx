@@ -5,9 +5,10 @@ import { trpc, getQueryClient } from "@/trpc/server";
 
 import { LibraryView } from "@/modules/library/ui/views/library-view";
 
-const page = async () => {
+const Page = async () => {
   const queryClient = getQueryClient();
-  void queryClient.prefetchInfiniteQuery(
+
+  await queryClient.prefetchInfiniteQuery(
     trpc.library.getMany.infiniteQueryOptions({
       limit: DEFAULT_LIMIT,
     }),
@@ -20,4 +21,4 @@ const page = async () => {
   );
 };
 
-export default page;
+export default Page;
