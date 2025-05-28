@@ -142,15 +142,17 @@ export const libraryRouter = createTRPCRouter({
         {},
       );
 
-      // map product data with review summaries
+      // map product data with review summaries  // unit tests (pr #25)
       const dataWithSummarizedReviews = productsData.docs.map((doc) => {
         const productReviews = reviewsByProductId[doc.id] || [];
         const reviewCount = productReviews.length;
-        const reviewRating =
+        const rawAverage =
           reviewCount === 0
             ? 0
             : productReviews.reduce((acc, review) => acc + review.rating, 0) /
               reviewCount;
+        const reviewRating = Math.round(rawAverage * 100) / 100; // round to two decimal places
+
         return {
           ...doc,
           reviewCount,

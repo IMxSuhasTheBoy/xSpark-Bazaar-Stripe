@@ -1,7 +1,14 @@
 import type { CollectionConfig } from "payload";
 
+import { isSuperAdmin } from "@/lib/access";
+
 export const Tenants: CollectionConfig = {
   slug: "tenants",
+  access: {
+    create: ({ req }) => isSuperAdmin(req.user),
+    update: ({ req }) => isSuperAdmin(req.user),
+    delete: ({ req }) => isSuperAdmin(req.user),
+  },
   admin: {
     useAsTitle: "slug",
   },
@@ -23,6 +30,9 @@ export const Tenants: CollectionConfig = {
       index: true,
       unique: true,
       required: true,
+      access: {
+        update: ({ req }) => isSuperAdmin(req.user),
+      },
       admin: {
         description:
           "This is the subdomain for the store you are creating. (e.g. [slug].xsparkbazaar.com)",
@@ -40,15 +50,18 @@ export const Tenants: CollectionConfig = {
       name: "razorpayAccountId",
       type: "text",
       required: false,
+      access: {
+        update: ({ req }) => isSuperAdmin(req.user),
+      },
       admin: {
         readOnly: true,
+        description: "Razorpay account ID associated with your store.",
       },
     },
     {
       name: "razorpayDetailsSubmitted",
       type: "checkbox",
       admin: {
-        readOnly: true,
         description:
           "You cannot create products until you have submitted your Razorpay details.",
       },

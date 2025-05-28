@@ -9,6 +9,8 @@ import { payloadCloudPlugin } from "@payloadcms/payload-cloud";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { multiTenantPlugin } from "@payloadcms/plugin-multi-tenant";
 
+import { isSuperAdmin } from "./lib/access";
+
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Categories } from "./collections/Categories";
@@ -46,7 +48,16 @@ export default buildConfig({
     },
   },
   // Define and configure your collections in this array
-  collections: [Users, Media, Categories, Products, Tags, Tenants, Orders, Reviews],
+  collections: [
+    Users,
+    Media,
+    Categories,
+    Products,
+    Tags,
+    Tenants,
+    Orders,
+    Reviews,
+  ],
   editor: lexicalEditor(),
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || "",
@@ -73,8 +84,7 @@ export default buildConfig({
       tenantsArrayField: {
         includeDefaultField: false,
       },
-      userHasAccessToAllTenants: (user) =>
-        Boolean(user?.roles?.includes("super-admin")),
+      userHasAccessToAllTenants: (user) => isSuperAdmin(user),
     }),
     // storage-adapter-placeholder
   ],
