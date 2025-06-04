@@ -2,11 +2,10 @@
 
 import { InboxIcon } from "lucide-react";
 
-import { useTRPC } from "@/trpc/client";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
+import { useTRPC } from "@/trpc/client";
 import { DEFAULT_LIMIT } from "@/constants";
-
 import { Button } from "@/components/ui/button";
 
 import { ProductCard, ProductCardSkeleton } from "./product-card";

@@ -4,9 +4,9 @@
   responsive layout for different screen sizes.
 */
 
+import { useParams } from "next/navigation";
 import { ListFilterIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+
 import { tenantsArrayField } from "@payloadcms/plugin-multi-tenant/fields";
 
 import { isSuperAdmin } from "@/lib/access";

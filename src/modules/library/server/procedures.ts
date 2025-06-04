@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { TRPCError } from "@trpc/server";
 
 import { DEFAULT_LIMIT } from "@/constants";
@@ -19,20 +20,15 @@ export const libraryRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const ordersData = await ctx.db.find({
         collection: "orders",
-        depth: 0, // Control relationship depth for just ids
         pagination: false,
         limit: 1,
         where: {
           and: [
             {
-              product: {
-                equals: input.productId,
-              },
+              product: { equals: input.productId },
             },
             {
-              user: {
-                equals: ctx.session.user.id,
-              },
+              user: { equals: ctx.session.user.id },
             },
           ],
         },
@@ -49,7 +45,6 @@ export const libraryRouter = createTRPCRouter({
 
       const product = await ctx.db.findByID({
         collection: "products",
-        // depth: 2, // Control relationship depth for populating "category", "image", "tenant" & "tenant.image".
         id: input.productId,
       }); // query db
 
@@ -73,17 +68,15 @@ export const libraryRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const ordersData = await ctx.db.find({
         collection: "orders",
-        depth: 0,
+        depth: 0, // only ids are required
         limit: input.limit,
         page: input.cursor,
         where: {
-          user: {
-            equals: ctx.session.user.id,
-          },
+          user: { equals: ctx.session.user.id },
         },
       }); // query db
 
-      const productIds = ordersData.docs.map((order) => order.product);
+      const productIds = ordersData.docs.map((order) => order.product); // string
 
       // validation for empty product IDs array. If a user has orders but no valid product IDs, the products query might behave unexpectedly.
       if (productIds.length === 0) {
@@ -106,9 +99,7 @@ export const libraryRouter = createTRPCRouter({
         pagination: false,
         // depth: 2, // Control relationship depth for populating "category", "image", "tenant" & "tenant.image".
         where: {
-          id: {
-            in: productIds,
-          },
+          id: { in: productIds },
         },
       }); // query db
 

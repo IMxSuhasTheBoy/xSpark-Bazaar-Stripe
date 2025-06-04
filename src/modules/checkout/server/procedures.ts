@@ -1,4 +1,6 @@
 import { z } from "zod";
+import type Stripe from "stripe";
+
 import { TRPCError } from "@trpc/server";
 
 import {
@@ -6,8 +8,10 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "@/trpc/init";
-import { razorpay } from "@/lib/razorpay";
+import { stripe } from "@/lib/stripe";
 import { Media, Tenant } from "@/payload-types";
+
+import { CheckoutMetadata, ProductMetadata } from "../types";
 
 export const checkoutRouter = createTRPCRouter({
   getProducts: baseProcedure
@@ -27,47 +31,6 @@ export const checkoutRouter = createTRPCRouter({
             },
           },
         }); // query db
-        /*  {
-              docs: [
-                {
-                  createdAt: '2025-05-21T06:32:22.644Z',
-                  updatedAt: '2025-05-21T06:34:01.972Z',
-                  tenant: [Object],
-                  name: 'imxsuhastheboy1 pro2',
-                  description: 'imxsuhastheboy1 pro2',
-                  price: 54,
-                  category: [Object],
-                  image: [Object],
-                  cover: [Object],
-                  refundPolicy: '1-day',
-                  tags: [Array],
-                  id: '682d737616bad3a45b0c099e'
-                },
-                {
-                  createdAt: '2025-05-14T07:51:17.524Z',
-                  updatedAt: '2025-05-21T06:33:14.719Z',
-                  tenant: [Object],
-                  name: 'imxsuhastheboy1 pro1',
-                  description: 'imxsuhastheboy1 pro1',
-                  price: 35,
-                  category: [Object],
-                  image: [Object],
-                  cover: [Object],
-                  refundPolicy: '3-day',
-                  id: '68244b75573eb4b3f0b8ef0f'
-                }
-              ],
-              totalDocs: 2,
-              limit: 10,
-              totalPages: 1,
-              page: 1,
-              pagingCounter: 1,
-              hasPrevPage: false,
-              hasNextPage: false,
-              prevPage: null,
-              nextPage: null
-            }
-        */
 
         //
         const foundIds = new Set(data.docs.map((doc) => doc.id));
@@ -100,6 +63,24 @@ export const checkoutRouter = createTRPCRouter({
       }
     }),
 
+  /**
+   * Initiates a secure checkout process for products.
+   *
+   * This procedure performs two critical validations at the ORM level:
+   * 1. Verifies that all requested products exist in the database
+   * 2. Ensures products belong to the specified tenant's slug
+   *
+   * This double validation safeguards against:
+   * - Attempts to purchase non-existent products
+   * - Cross-tenant product access
+   * - Data integrity issues during checkout
+   *
+   * @input {object} input
+   * @input {string[]} input.productIds - Array of product IDs to purchase
+   * @input {string} input.tenantSlug - Unique identifier of the tenant
+   *
+   * @throws {TRPCError} When products are not found or tenant validation fails
+   */
   purchase: protectedProcedure
     .input(
       z.object({
@@ -114,53 +95,17 @@ export const checkoutRouter = createTRPCRouter({
         depth: 2,
         where: {
           and: [
-            { id: { in: input.productIds } },
-            { "tenant.slug": { equals: input.tenantSlug } },
+            {
+              id: { in: input.productIds },
+            },
+            {
+              "tenant.slug": { equals: input.tenantSlug },
+            },
           ],
         },
       });
-      /*
-      {
-        docs: [
-          {
-            createdAt: '2025-05-21T06:32:22.644Z',
-            updatedAt: '2025-05-21T06:34:01.972Z',
-            tenant: [Object],
-            name: 'imxsuhastheboy1 pro2',
-            description: 'imxsuhastheboy1 pro2',
-            price: 54,
-            category: [Object],
-            image: [Object],
-            cover: [Object],
-            refundPolicy: '1-day',
-            tags: [Array],
-            id: '682d737616bad3a45b0c099e'
-          },
-          {
-            createdAt: '2025-05-14T07:51:17.524Z',
-            updatedAt: '2025-05-21T06:33:14.719Z',
-            tenant: [Object],
-            name: 'imxsuhastheboy1 pro1',
-            description: 'imxsuhastheboy1 pro1',
-            price: 35,
-            category: [Object],
-            image: [Object],
-            cover: [Object],
-            refundPolicy: '3-day',
-            id: '68244b75573eb4b3f0b8ef0f'
-          }
-        ],
-        totalDocs: 2,
-        limit: 10,
-        totalPages: 1,
-        page: 1,
-        pagingCounter: 1,
-        hasPrevPage: false,
-        hasNextPage: false,
-        prevPage: null,
-        nextPage: null
-      } 
-      */
+
+      // TODO: if required check for ensuring the user cannot purchase already owned product again.
 
       // not required: const foundIds = new Set(products.docs.map((doc) => doc.id));
       // not required: const missingIds = input.productIds.filter((id) => !foundIds.has(id));
@@ -171,7 +116,7 @@ export const checkoutRouter = createTRPCRouter({
         });
       }
 
-      // find that tenant who has listed the products
+      // Retrieve tenant details associated with the listed products
       const tenantsData = await ctx.db.find({
         collection: "tenants",
         depth: 1,
@@ -191,179 +136,76 @@ export const checkoutRouter = createTRPCRouter({
         });
       }
 
-      // TODO: verify for throwing error: razorpay details not submitted
+      // TODO: verify for throwing error: stripe details not submitted
 
-      // Calculate total amount (in paise)
-      const totalAmount =
-        products.docs.reduce((acc, product) => acc + product.price, 0) * 100;
+      // const totalAmount =
+      //   products.docs.reduce((acc, product) => acc + product.price, 0) * 100;
 
-      /*
-        if (totalAmount <= 0) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid order amount",
-          });
-        }
-      */
+      // if (totalAmount <= 0) {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "Invalid order amount",
+      //   });
+      // }
 
-      // Create Razorpay order // 2:09 note: on stripe flow creates lineItems (individual order for each product)
-      const razorpayOrder = await razorpay.orders.create({
-        amount: totalAmount,
-        currency: "INR",
-        receipt: `order_${Date.now()}`,
-        notes: {
-          // razorpayAccountId: tenant.razorpayAccountId,
-          tenantSlug: input.tenantSlug,
+      /* This code prepares list of products (called "line items") to send to Stripe when creating a checkout session.
+       Each "line item" represents a product in the cart.
+
+       How does it fit in the checkout flow?
+        - User clicks "Checkout".
+        - Backend runs this code to prepare the list of products for Stripe.
+        - Stripe checkout session is created with these line items.
+        - User is redirected to Stripe to pay for these items.
+        - After payment, Stripe notifies backend (via webhook).
+        - Backend receives the metadata to create orders and associate them with the correct user, product, and tenant.
+       */
+      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
+        products.docs.map((product) => ({
+          quantity: 1,
+          price_data: {
+            currency: "INR",
+            unit_amount: product.price * 100, // miliunits
+            product_data: {
+              name: product.name,
+              ...(typeof product.description === "string"
+                ? { description: product.description }
+                : {}),
+              metadata: {
+                stripeAccountId: tenant.stripeAccountId,
+                id: product.id,
+                name: product.name,
+                price: product.price,
+              } as ProductMetadata,
+            },
+          },
+        }));
+
+      /* Create Stripe checkout session, which is a secure Stripe-hosted payment page */
+      const checkout = await stripe.checkout.sessions.create({
+        customer_email: ctx.session.user.email,
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/tenants/${input.tenantSlug}/checkout?success=true`, // TODO: "Thank you" or order confirmation page.
+        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/tenants/${input.tenantSlug}/checkout?cancel=true`, // TODO: back to the cart or checkout page.
+        mode: "payment",
+        line_items: lineItems,
+        invoice_creation: { enabled: true },
+        metadata: {
           userId: ctx.session.user.id,
-          productIds: input.productIds.join(","),
-        },
-        // The notes field can be used to pass productIds, tenantSlug, userId, etc. from order creation
+        } as CheckoutMetadata,
       });
-      /*
-      {
-        amount: 8900,
-        amount_due: 8900,
-        amount_paid: 0,
-        attempts: 0,
-        created_at: 1747891442,
-        currency: 'INR',
-        entity: 'order',
-        id: 'order_QXrGFuJMPVl1uz',
-        notes: {
-          productIds: '682d737616bad3a45b0c099e,68244b75573eb4b3f0b8ef0f',        
-          tenantSlug: 'imxsuhastheboy1',
-          userId: '681cae95158b1ae56ec2df61'
-        },
-        offer_id: null,
-        receipt: 'order_1747891443599',
-        status: 'created'
-      }
-      */
-      console.log("checkoutRouter: purchase: razorpayOrder:", razorpayOrder);
 
-      if (!razorpayOrder || !razorpayOrder.id) {
+      if (!checkout.url) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create Razorpay order",
+          message: "Failed to create Stripe checkout session",
         });
       }
 
-      // Return order details for frontend Razorpay checkout
+      /* Send the Stripe Checkout URL back to the frontend.
+        The frontend will redirect the user to this URL so they can pay.
+        After payment, Stripe can notify backend (via webhook) so backend can create the orders.
+      */
       return {
-        razorpayOrderId: razorpayOrder.id,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        tenantSlug: input.tenantSlug,
-        userEmail: ctx.session.user.email,
-        userName: ctx.session.user.username || ctx.session.user.email,
-
-        // You may add more fields as needed
+        checkoutUrl: checkout.url,
       };
     }),
 });
-
-/*  moved to api/razorpay/webhooks/route.ts
- verifyPayment: protectedProcedure
-    .input(
-      z.object({
-        razorpayOrderId: z.string(),
-        razorpayPaymentId: z.string(),
-        razorpaySignature: z.string(),
-        tenantSlug: z.string(),
-        productIds: z.array(z.string()),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const crypto = await import("crypto");
-      const generatedSignature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-        .update(input.razorpayOrderId + "|" + input.razorpayPaymentId)
-        .digest("hex");
-
-      if (generatedSignature !== input.razorpaySignature) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Invalid payment signature",
-        });
-      }
-
-      // Fetch products and tenant as before
-      const products = await ctx.db.find({
-        collection: "products",
-        depth: 2,
-        where: {
-          and: [
-            { id: { in: input.productIds } },
-            { "tenant.slug": { equals: input.tenantSlug } },
-          ],
-        },
-      });
-
-      if (products.totalDocs !== input.productIds.length) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Products not found",
-        });
-      }
-      console.log("checkoutRouter: verifyPayment: products:", products);
-      
-      // {
-      //   docs: [
-      //     {
-      //       createdAt: '2025-05-14T07:39:57.894Z',
-      //       updatedAt: '2025-05-14T07:41:20.590Z',
-      //       tenant: [Object],
-      //       name: 'imxsuhastheboy pro3',
-      //       description: 'imxsuhastheboy pro3',
-      //       price: 90,
-      //       category: [Object],
-      //       tags: [],
-      //       image: [Object],
-      //       cover: [Object],
-      //       refundPolicy: 'no-refunds',
-      //       id: '682448cd573eb4b3f0b8eaa0'
-      //     },
-      //     {
-      //       createdAt: '2025-05-13T11:00:52.323Z',
-      //       updatedAt: '2025-05-13T11:00:52.323Z',
-      //       tenant: [Object],
-      //       name: 'imxsuhastheboy pro1',
-      //       description: 'imxsuhastheboy pro1',
-      //       price: 50,
-      //       category: [Object],
-      //       tags: [Array],
-      //       image: [Object],
-      //       cover: [Object],
-      //       refundPolicy: '14-day',
-      //       id: '68232664c43f70e02b820642'
-      //     }
-      //   ],
-      //   totalDocs: 2,
-      //   limit: 10,
-      //   totalPages: 1,
-      //   page: 1,
-      //   pagingCounter: 1,
-      //   hasPrevPage: false,
-      //   hasNextPage: false,
-      //   prevPage: null,
-      //   nextPage: null
-      // }
-      
-      // Create an order record for each product (customize as needed)
-      const userId = ctx.session.user.id;
-      for (const product of products.docs) {
-        await ctx.db.create({
-          collection: "orders",
-          data: {
-            name: product.name,
-            user: userId,
-            product: product.id,
-            paymentId: input.razorpayPaymentId,
-          },
-        });
-      }
-      
-      return { success: true };
-    }),
-    
-    */

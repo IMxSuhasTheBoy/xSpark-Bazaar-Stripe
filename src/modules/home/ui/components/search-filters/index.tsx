@@ -5,8 +5,8 @@ import { useParams } from "next/navigation";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { DEFAULT_BG_COLOR } from "@/modules/home/constants";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 import { Categories } from "./categories";
 import { SearchInput } from "./search-input";

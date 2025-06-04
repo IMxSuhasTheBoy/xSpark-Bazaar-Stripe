@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { toast } from "sonner";
 import { useState } from "react";
-
 import { useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -31,7 +31,8 @@ const formSchema = z.object({
 });
 
 export const ReviewForm = ({ productId, initialData }: Props) => {
-  const [isPreview, setIsPreview] = useState(!!initialData);
+  const [isPreview, setIsPreview] = useState(!!initialData); // edit/new review mode
+  // If initialData is provided, set isPreview to true, otherwise false
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -95,7 +96,7 @@ export const ReviewForm = ({ productId, initialData }: Props) => {
   return (
     <Form {...form}>
       <form
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-y-4"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <p className="font-medium">
@@ -148,6 +149,7 @@ export const ReviewForm = ({ productId, initialData }: Props) => {
           </Button>
         )}
       </form>
+
       {isPreview && (
         <Button
           onClick={() => setIsPreview(false)}

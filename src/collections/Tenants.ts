@@ -6,7 +6,6 @@ export const Tenants: CollectionConfig = {
   slug: "tenants",
   access: {
     create: ({ req }) => isSuperAdmin(req.user),
-    update: ({ req }) => isSuperAdmin(req.user),
     delete: ({ req }) => isSuperAdmin(req.user),
   },
   admin: {
@@ -47,23 +46,22 @@ export const Tenants: CollectionConfig = {
       },
     },
     {
-      name: "razorpayAccountId",
+      name: "stripeAccountId",
       type: "text",
-      required: false,
+      required: true,
       access: {
         update: ({ req }) => isSuperAdmin(req.user),
       },
       admin: {
-        readOnly: true,
-        description: "Razorpay account ID associated with your store.",
+        description: "Stripe account ID associated with your store.",
       },
     },
     {
-      name: "razorpayDetailsSubmitted",
+      name: "stripeDetailsSubmitted",
       type: "checkbox",
       admin: {
         description:
-          "You cannot create products until you have submitted your Razorpay details.",
+          "You cannot create products until you have submitted your Stripe details.",
       },
     },
   ],

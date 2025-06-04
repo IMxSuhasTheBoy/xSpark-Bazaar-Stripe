@@ -1,13 +1,13 @@
 import Link from "next/link";
 
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const HOVER_STYLES = {
   default: "hover:border-primary hover:bg-accent",

@@ -14,7 +14,6 @@ export const Tags: CollectionConfig = {
     useAsTitle: "name",
     hidden: ({ user }) => !isSuperAdmin(user),
   },
-
   fields: [
     {
       name: "name",

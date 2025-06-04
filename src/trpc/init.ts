@@ -1,4 +1,4 @@
-/* tRPC server context setup, base router, and base procedure middleware for Payload CMS integration */
+/* tRPC server context setup, base router, base procedure, protected procedure and middleware for Payload CMS integration */
 
 import { cache } from "react";
 import superjson from "superjson";
@@ -14,7 +14,7 @@ export const createTRPCContext = cache(async () => {
    */
   return { userId: "user_123" };
 
-  /* // TODO: Replace with actual authentication logic
+  /* // TODO: Replace with actual authentication logic if needed.
     const session = await getSession(); // Example placeholder for your auth solution
     return { userId: session?.user?.id || null };
    */
@@ -41,7 +41,7 @@ export const baseProcedure = t.procedure.use(async ({ next }) => {
       ctx: { db: payload },
     });
   } catch (error) {
-    // Log the error for debugging
+    // For debugging
     console.error("Failed to initialize Payload CMS:", error);
 
     // Re-throw with a clearer message for API consumers
@@ -66,7 +66,7 @@ export const baseProcedure = t.procedure.use(async ({ next }) => {
  * @throws {TRPCError} If the user is not authenticated.
  *
  * @example
- * // Usage in a TRPC router
+ * Usage in a TRPC router
  * const router = t.router({
  *   secureEndpoint: protectedProcedure.query(() => {
  *     return "This is a secure endpoint";
@@ -82,7 +82,7 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
   if (!session.user) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
-      message: "Not authenticated",
+      message: "Not authenticated, Please sign in to continue.", // Access denied. Please log in to continue
     });
   }
 
