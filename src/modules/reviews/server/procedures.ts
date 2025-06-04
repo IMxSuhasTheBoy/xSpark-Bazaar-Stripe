@@ -29,14 +29,10 @@ export const reviewsRouter = createTRPCRouter({
         where: {
           and: [
             {
-              product: {
-                equals: input.productId,
-              },
+              product: { equals: input.productId },
             },
             {
-              user: {
-                equals: ctx.session.user.id,
-              },
+              user: { equals: ctx.session.user.id },
             },
           ],
         },
@@ -78,14 +74,10 @@ export const reviewsRouter = createTRPCRouter({
         where: {
           and: [
             {
-              product: {
-                equals: input.productId,
-              },
+              product: { equals: input.productId },
             },
             {
-              user: {
-                equals: ctx.session.user.id,
-              },
+              user: { equals: ctx.session.user.id },
             },
           ],
         },

@@ -27,11 +27,13 @@ export const ProductView = ({ productId }: Props) => {
           <span className="text font-medium">Back to Library</span>
         </Link>
       </nav>
+
       <header className="border-b bg-[#F4F4F0] py-8">
         <div className="mx-auto max-w-(--breakpoint-xl) px-4 lg:px-12">
           <h1 className="text-[40px] font-medium">{data.name}</h1>
         </div>
       </header>
+
       <section className="mx-auto max-w-(--breakpoint-xl) px-4 py-10 lg:px-12">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 lg:gap-16">
           <div className="lg:col-span-2">
@@ -42,7 +44,7 @@ export const ProductView = ({ productId }: Props) => {
 
           <div className="lg:col-span-5">
             {data.content ? (
-              <p> {data.content}</p>
+              <p>{data.content}</p>
             ) : (
               <p className="text-muted-foreground font-medium italic">
                 No specific content

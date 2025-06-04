@@ -1,16 +1,10 @@
 "use client";
 
-declare global {
-  interface Window {
-    Razorpay: Razorpay;
-  }
-}
-
 import { toast } from "sonner";
-import Script from "next/script";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { InboxIcon, LoaderIcon } from "lucide-react";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
@@ -41,94 +35,6 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
     }),
   );
 
-  console.log("checkout-view: data: ", { data });
-  /* example: requested with 2 ids of cart, recieved only 1 product for it & missingIds array
-  {
-    "data": {
-      "docs": [
-        {
-          "createdAt": "2025-05-14T07:51:17.524Z",
-          "updatedAt": "2025-05-21T06:33:14.719Z",
-          "tenant": {
-                    "createdAt": "2025-05-08T13:22:16.416Z",
-                    "updatedAt": "2025-05-08T13:22:16.416Z",
-                    "name": "imxsuhastheboy1",
-                    "slug": "imxsuhastheboy1",
-                    "stripeAccountId": "test",
-                    "id": "681cb008158b1ae56ec2e0b2"
-                },
-                "name": "imxsuhastheboy1 pro1",
-                "description": "imxsuhastheboy1 pro1",
-                "price": 35,
-                "category": {
-                    "createdAt": "2025-05-08T13:14:16.670Z",
-                    "updatedAt": "2025-05-08T13:14:16.670Z",
-                    "name": "Fitness & Health",
-                    "slug": "fitness-health",
-                    "color": "#FF9AA2",
-                    "parent": null,
-                    "subcategories": {
-                        "docs": [
-                            "681cae29986cef368e225444",
-                            "681cae29986cef368e225441",
-                            "681cae29986cef368e22543e",
-                            "681cae28986cef368e22543b"
-                        ],
-                        "hasNextPage": false
-                    },
-                    "id": "681cae28986cef368e225439"
-                },
-                "image": {
-                    "createdAt": "2025-05-14T07:50:45.271Z",
-                    "updatedAt": "2025-05-21T06:33:02.352Z",
-                    "alt": "imxsuhastheboy1",
-                    "filename": "1-1.png",
-                    "mimeType": "image/png",
-                    "filesize": 40424,
-                    "width": 1025,
-                    "height": 1025,
-                    "focalX": 50,
-                    "focalY": 50,
-                    "thumbnailURL": null,
-                    "url": "/api/media/file/1-1.png",
-                    "id": "68244b55573eb4b3f0b8eedb"
-                },
-                "cover": {
-                    "createdAt": "2025-05-14T07:51:11.120Z",
-                    "updatedAt": "2025-05-14T07:51:11.120Z",
-                    "alt": "imxsuhastheboy1",
-                    "filename": "Texture9-1.jpg",
-                    "mimeType": "image/jpeg",
-                    "filesize": 671005,
-                    "width": 1920,
-                    "height": 1080,
-                    "focalX": 50,
-                    "focalY": 50,
-                    "id": "68244b6f573eb4b3f0b8eef8",
-                    "url": "/api/media/file/Texture9-1.jpg",
-                    "thumbnailURL": null
-                },
-                "refundPolicy": "3-day",
-                "id": "68244b75573eb4b3f0b8ef0f"
-            }
-        ],
-        "totalDocs": 1,
-        "limit": 10,
-        "totalPages": 1,
-        "page": 1,
-        "pagingCounter": 1,
-        "hasPrevPage": false,
-        "hasNextPage": false,
-        "prevPage": null,
-        "nextPage": null,
-        "totalPrice": 35,
-        "missingIds": [
-            "682d737616bad3a45b0c099e"
-        ]
-    }
-  }
-  */
-
   const hasMissingProducts = (data?.missingIds ?? []).length > 0; // TODO: invalid products found: when checkout page loads for the first time immediately perform missing ids clearing on cart & dont allow to checkout until dialog to confirm checkout with the remaining ids from localstorage cart is confirmed
 
   // useEffect(() => {
@@ -148,46 +54,13 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
       onMutate: () => {
         setStates({ success: false, cancel: false });
       },
-      onSuccess: async (data) => {
-        // TODO: figureout if this options obj can be formed in procedures & just recive it here
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount: data.amount,
-          currency: data.currency,
-          name: "xSparkBazaar",
-          order_id: data.razorpayOrderId,
-          prefill: {
-            email: data.userEmail,
-            name: data.userName,
-          },
-
-          handler: function () {
-            toast.success("Payment successful!");
-            setStates({ success: true, cancel: false });
-            clearCart();
-            queryClient.invalidateQueries(
-              trpc.library.getMany.infiniteQueryFilter(),
-            );
-            window.location.href = "/library"; // More reliable navigation after payment
-            // router.push("/products");
-            // setStates({ success: false, cancel: false }); // check for any issues
-          },
-          modal: {
-            ondismiss: function () {
-              setStates({ success: false, cancel: true });
-              toast.info("Payment popup closed. No payment was made.");
-            },
-            escape: false,
-            confirm_close: true,
-          },
-          theme: { color: "#FBBF24" },
-        };
-        const rzp = new window.Razorpay(options);
-        rzp.open();
+      onSuccess: (data) => {
+        // Link was succesfully created
+        window.location.href = data.checkoutUrl;
       },
       onError: (error) => {
         if (error.data?.code === "UNAUTHORIZED") {
-          // TODO: modify when subdomains enables
+          // TODO: modify when subdomain enables
           router.push("/sign-in");
         }
 
@@ -202,22 +75,21 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
     toast.info("Payment was cancelled. You can try again.");
   }, [states.cancel]);
 
-  // useEffect(() => {
-  //   if (states.success) {
-  //     setStates({ success: false, cancel: false }); // check if requied. checked After pr #22 probably required. still getting max depth err
-  //     clearCart(); // Clear cart after successful payment
-  //     queryClient.invalidateQueries(trpc.library.getMany.infiniteQueryFilter());
-  //     toast.success("Payment successful!");
-  //     router.push("/library");
-  //   }
-  // }, [
-  //   states.success,
-  //   clearCart,
-  //   router,
-  //   setStates,
-  //   queryClient,
-  //   trpc.library.getMany,
-  // ]);
+  useEffect(() => {
+    if (states.success) {
+      setStates({ success: false, cancel: false });
+      clearCart(); // Clear cart after payment success
+      queryClient.invalidateQueries(trpc.library.getMany.infiniteQueryFilter());
+      router.push("/library");
+    }
+  }, [
+    states.success,
+    clearCart,
+    router,
+    setStates,
+    queryClient,
+    trpc.library.getMany,
+  ]);
 
   if (isLoading) {
     return (
@@ -242,14 +114,6 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
 
   return (
     <>
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="afterInteractive"
-        onError={() =>
-          toast.error("Failed to load Razorpay SDK. Please refresh the page.")
-        }
-      />
-
       {/* <UnavailableProductsDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}

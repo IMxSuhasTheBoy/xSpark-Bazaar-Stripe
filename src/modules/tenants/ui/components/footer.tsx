@@ -1,7 +1,8 @@
 import Link from "next/link";
 
-import { cn } from "@/lib/utils";
 import { Poppins } from "next/font/google";
+
+import { cn } from "@/lib/utils";
 
 const poppins = Poppins({
   weight: ["700"],

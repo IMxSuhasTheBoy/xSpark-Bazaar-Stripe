@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 
-import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+import { getQueryClient, trpc } from "@/trpc/server";
 
 import { Navbar } from "@/modules/home/ui/components/navbar";
 import { Footer } from "@/modules/home/ui/components/footer";
@@ -36,9 +37,7 @@ const Layout = async ({ children }: Props) => {
 export default Layout;
 
 /*
-
-
-data :
+data:
 [
   {
     "name": "Categorie1",
@@ -64,8 +63,8 @@ data :
 ]
 
 
-formatedData :
- [
+formatedData:
+[
   {
     "name": "Categorie1",
     "color": "#FFB347",
@@ -81,5 +80,4 @@ formatedData :
     "id": "68034114d2ad137981185940"
   }
 ]
-
- */
+*/

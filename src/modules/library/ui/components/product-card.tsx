@@ -35,6 +35,7 @@ export const ProductCard = ({
             }}
           />
         </div>
+
         <div className="flex flex-1 flex-col gap-3 border-y p-4">
           <h2 className="line-clamp-4 text-lg font-medium">{name}</h2>
           <div className="flex items-center gap-2">
@@ -49,10 +50,11 @@ export const ProductCard = ({
             )}
             <p className="text-sm font-medium underline">{tenantSlug}</p>
           </div>
+
           {reviewCount > 0 && (
             <div className="flex items-center gap-1">
               <StarIcon className="size-3.5 fill-black" />
-              <p className="text-sm font-medium text-gray-500">
+              <p className="text-sm font-medium">
                 {reviewRating} ({reviewCount})
               </p>
             </div>

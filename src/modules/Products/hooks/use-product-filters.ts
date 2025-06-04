@@ -4,6 +4,7 @@ import {
   parseAsArrayOf,
   parseAsStringLiteral,
 } from "nuqs";
+
 import { sortValues } from "../search-params";
 
 const params = {

@@ -1,8 +1,10 @@
 import { headers as getHeaders } from "next/headers";
 
 import { TRPCError } from "@trpc/server";
+
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 
+import { stripe } from "@/lib/stripe";
 import { generateAuthCookie } from "../utils";
 import { loginSchema, registerSchema } from "../schemas";
 
@@ -39,12 +41,21 @@ export const authRouter = createTRPCRouter({
         });
       }
 
+      const account = await stripe.accounts.create({});
+
+      if (!account) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Failed to create Stripe account.",
+        });
+      }
+
       const tenant = await ctx.db.create({
         collection: "tenants",
         data: {
           name: input.username,
           slug: input.username,
-          stripeAccountId: "test",
+          stripeAccountId: account.id,
         },
       });
 
@@ -103,18 +114,4 @@ export const authRouter = createTRPCRouter({
 
     return data;
   }),
-
-  /* 
-    Logout procedure: Terminates user session
-    - Removes the authentication cookie
-    - Effectively ends the user's session
-    - No authentication required to perform logout
-  */
-  // logout: baseProcedure.mutation(async () => {
-  //   const cookie = await getCookies();
-  //   cookie.delete({
-  //     name: AUTH_COOKIE,
-  //     path: "/",
-  //   });
-  // }),
 });

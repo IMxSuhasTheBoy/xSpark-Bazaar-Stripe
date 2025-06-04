@@ -38,12 +38,19 @@ export const Orders: CollectionConfig = {
       },
     },
     {
-      name: "razorpayCheckoutSessionId",
+      name: "stripeCheckoutSessionId",
       type: "text",
       required: true,
       admin: {
         description:
-          "Razorpay checkout session associated with the order. Razorpay payment ID",
+          "Stripe checkout session associated with the order. Stripe payment ID",
+      },
+    },
+    {
+      name: "stripeAccountId",
+      type: "text",
+      admin: {
+        description: "Stripe account ID associated with your order.",
       },
     },
   ],

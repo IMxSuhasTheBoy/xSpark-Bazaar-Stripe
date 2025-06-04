@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { MenuIcon } from "lucide-react";
 import { Poppins } from "next/font/google";
 import { usePathname } from "next/navigation";
-import { MenuIcon } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
+
 import { useTRPC } from "@/trpc/client";
 
 import { cn } from "@/lib/utils";

@@ -173,13 +173,13 @@ export interface Tenant {
    */
   image?: (string | null) | Media;
   /**
-   * Razorpay account ID associated with your store.
+   * Stripe account ID associated with your store.
    */
-  razorpayAccountId?: string | null;
+  stripeAccountId: string;
   /**
-   * You cannot create products until you have submitted your Razorpay details.
+   * You cannot create products until you have submitted your Stripe details.
    */
-  razorpayDetailsSubmitted?: boolean | null;
+  stripeDetailsSubmitted?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -242,7 +242,7 @@ export interface Product {
   cover?: (string | null) | Media;
   refundPolicy?: ('30-day' | '14-day' | '7-day' | '3-day' | '1-day' | 'no-refunds') | null;
   /**
-   * Protected conten only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports Markdown fomatting.
+   * Protected content only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports Markdown formatting.
    */
   content?: string | null;
   updatedAt: string;
@@ -272,9 +272,13 @@ export interface Order {
    */
   product: string | Product;
   /**
-   * Razorpay checkout session associated with the order. Razorpay payment ID
+   * Stripe checkout session associated with the order. Stripe payment ID
    */
-  razorpayCheckoutSessionId: string;
+  stripeCheckoutSessionId: string;
+  /**
+   * Stripe account ID associated with your order.
+   */
+  stripeAccountId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -462,8 +466,8 @@ export interface TenantsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   image?: T;
-  razorpayAccountId?: T;
-  razorpayDetailsSubmitted?: T;
+  stripeAccountId?: T;
+  stripeDetailsSubmitted?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -475,7 +479,8 @@ export interface OrdersSelect<T extends boolean = true> {
   name?: T;
   user?: T;
   product?: T;
-  razorpayCheckoutSessionId?: T;
+  stripeCheckoutSessionId?: T;
+  stripeAccountId?: T;
   updatedAt?: T;
   createdAt?: T;
 }

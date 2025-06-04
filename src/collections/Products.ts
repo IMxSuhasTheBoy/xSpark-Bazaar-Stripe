@@ -11,7 +11,7 @@ export const Products: CollectionConfig = {
 
       const tenant = req.user?.tenants?.[0]?.tenant as Tenant;
 
-      return Boolean(tenant?.razorpayDetailsSubmitted);
+      return Boolean(tenant?.stripeDetailsSubmitted);
     },
   },
   admin: {
@@ -71,43 +71,8 @@ export const Products: CollectionConfig = {
       type: "textarea",
       admin: {
         description:
-          "Protected conten only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports Markdown fomatting.",
+          "Protected content only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports Markdown formatting.",
       },
     },
   ],
 };
-
-/*
-additions:
-
-{
-      name: "sku",
-      type: "text",
-      admin: {
-        description: "Unique product identifier",
-      },
-    },
-    {
-      name: "stockQuantity",
-      type: "number",
-      defaultValue: 0,
-      admin: {
-        description: "Available inventory",
-      },
-    },
-    {
-      name: "brand",
-      type: "text",
-    },
-    {
-      name: "tags",
-      type: "array",
-      fields: [
-        {
-          name: "tag",
-          type: "text",
-        },
-      ],
-    },
-
-*/

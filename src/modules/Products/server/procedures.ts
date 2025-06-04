@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { Sort, Where } from "payload";
+import type { Sort, Where } from "payload";
 import { headers as getHeaders } from "next/headers";
 
 import { DEFAULT_LIMIT } from "@/constants";
-import { Category, Media, Review, Tenant } from "@/payload-types";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
+import { Category, Media, Review, Tenant } from "@/payload-types";
 
 import { sortValues } from "../search-params";
 
@@ -21,17 +21,7 @@ export const productsRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const headers = await getHeaders();
-      let session;
-      try {
-        session = await ctx.db.auth({
-          headers,
-        });
-      } catch {
-        console.warn(
-          "Authentication failed in products.getOne, proceeding as unauthenticated user",
-        );
-        session = { user: null };
-      }
+      const session = await ctx.db.auth({ headers });
 
       const product = await ctx.db.findByID({
         collection: "products",
@@ -52,14 +42,10 @@ export const productsRouter = createTRPCRouter({
           where: {
             and: [
               {
-                product: {
-                  equals: input.id,
-                },
+                product: { equals: input.id },
               },
               {
-                user: {
-                  equals: session.user.id,
-                },
+                user: { equals: session.user.id },
               },
             ],
           },
@@ -73,9 +59,7 @@ export const productsRouter = createTRPCRouter({
         collection: "reviews",
         pagination: false,
         where: {
-          product: {
-            equals: input.id,
-          },
+          product: { equals: input.id },
         },
       });
 
@@ -184,9 +168,7 @@ export const productsRouter = createTRPCRouter({
           depth: 1, // Control relationship depth for populating subcategories, subcategories.[0] will be of type "Category".
           pagination: false,
           where: {
-            slug: {
-              equals: input.category,
-            },
+            slug: { equals: input.category },
           },
         }); // query db
 
@@ -240,9 +222,7 @@ export const productsRouter = createTRPCRouter({
         collection: "reviews",
         pagination: false,
         where: {
-          product: {
-            in: productsIds,
-          },
+          product: { in: productsIds },
         },
       }); // query db
 

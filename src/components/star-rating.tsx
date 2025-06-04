@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import { StarIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 const MAX_RATING = 5;
 const MIN_RATING = 0;
@@ -18,7 +19,7 @@ export const StarRating = ({
   text,
 }: StarRatingProps) => {
   const safeRating = Math.max(MIN_RATING, Math.min(rating, MAX_RATING));
-  
+
   return (
     <div
       className={cn("flex items-center gap-x-1", classname)}
