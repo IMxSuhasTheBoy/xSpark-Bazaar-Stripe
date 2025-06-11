@@ -46,6 +46,9 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      beforeNavLinks: ["@/components/stripe-verify#StripeVerify"],
+    },
   },
   // Define and configure your collections in this array
   collections: [
