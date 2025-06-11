@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 
 import { stripe } from "@/lib/stripe";
+
 import { generateAuthCookie } from "../utils";
 import { loginSchema, registerSchema } from "../schemas";
 
@@ -41,7 +42,7 @@ export const authRouter = createTRPCRouter({
         });
       }
 
-      const account = await stripe.accounts.create({});
+      const account = await stripe.accounts.create({}); // TODO: Improve Stripe account creation and error handling (pr #25)
 
       if (!account) {
         throw new TRPCError({

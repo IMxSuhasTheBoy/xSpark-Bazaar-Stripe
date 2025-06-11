@@ -8,6 +8,14 @@ import { stripe } from "@/lib/stripe";
 import { ExpandedLineItem } from "@/modules/checkout/types";
 
 export async function POST(req: Request) {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    console.error("STRIPE_WEBHOOK_SECRET is not configured");
+    return NextResponse.json(
+      { message: "Webhook endpoint is not properly configured" },
+      { status: 500 },
+    );
+  }
   let event: Stripe.Event;
 
   try {
@@ -15,13 +23,13 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       await (await req.blob()).text(),
       req.headers.get("stripe-signature") as string,
-      process.env.STRIPE_WEBHOOK_SECRET as string,
+      webhookSecret,
     );
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
 
-    if (error! instanceof Error) {
+    if (!(error instanceof Error)) {
       console.log(error);
     }
 
@@ -33,7 +41,10 @@ export async function POST(req: Request) {
   }
   console.log("✔ Success: ", event.id);
 
-  const permittedEvents: string[] = ["checkout.session.completed"];
+  const permittedEvents: string[] = [
+    "checkout.session.completed",
+    "account.updated",
+  ];
 
   const payload = await getPayload({ config });
 
@@ -42,7 +53,7 @@ export async function POST(req: Request) {
 
     try {
       switch (event.type) {
-        case "checkout.session.completed":
+        case "checkout.session.completed": {
           data = event.data.object as Stripe.Checkout.Session;
 
           if (!data.metadata?.userId) {
@@ -63,6 +74,9 @@ export async function POST(req: Request) {
             {
               expand: ["line_items.data.price.product"],
             },
+            {
+              stripeAccount: event.account,
+            },
           );
 
           if (
@@ -82,20 +96,38 @@ export async function POST(req: Request) {
               // know if some products were bought together using the same checkout session data
               data: {
                 stripeCheckoutSessionId: data.id,
+                stripeAccountId: event.account,
                 user: user.id,
-                product: item.price.product.metadata.id,
+                product: item.price.product.metadata.id, // TODO: if requred Add validation for product metadata and error handling (pr #25)
                 name: item.price.product.name,
               },
             });
           }
           break;
+        }
+
+        case "account.updated": {
+          data = event.data.object as Stripe.Account;
+
+          await payload.update({
+            collection: "tenants",
+            where: {
+              stripeAccountId: { equals: data.id },
+            },
+            data: {
+              stripeDetailsSubmitted: data.details_submitted,
+            },
+          });
+          break;
+        }
+
         default:
           throw new Error(`Unhandled event type: ${event.type}`);
       }
     } catch (error) {
-      console.log(error);
+      console.error(`Error processing webhook event ${event.type}:`, error);
       return NextResponse.json(
-        { message: `Webhook handler failed.` },
+        { message: "Webhook handler failed." },
         { status: 500 },
       );
     }

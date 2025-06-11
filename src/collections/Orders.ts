@@ -12,7 +12,7 @@ export const Orders: CollectionConfig = {
   },
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "user", "product", "razorpayCheckoutSessionId"],
+    defaultColumns: ["name", "user", "product", "stripeCheckoutSessionId"],
   },
   fields: [
     {
@@ -50,7 +50,7 @@ export const Orders: CollectionConfig = {
       name: "stripeAccountId",
       type: "text",
       admin: {
-        description: "Stripe account ID associated with your order.",
+        description: "Stripe account ID associated with the order.",
       },
     },
   ],
