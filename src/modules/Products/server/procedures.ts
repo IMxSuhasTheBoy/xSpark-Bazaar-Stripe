@@ -2,6 +2,8 @@ import { z } from "zod";
 import type { Sort, Where } from "payload";
 import { headers as getHeaders } from "next/headers";
 
+import { TRPCError } from "@trpc/server";
+
 import { DEFAULT_LIMIT } from "@/constants";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { Category, Media, Review, Tenant } from "@/payload-types";
@@ -30,7 +32,14 @@ export const productsRouter = createTRPCRouter({
         select: {
           content: false, // do not fetch content field
         },
-      });
+      }); // query db
+
+      if (product.isArchived) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Product not found",
+        });
+      }
 
       let isPurchased = false;
 
@@ -49,7 +58,7 @@ export const productsRouter = createTRPCRouter({
               },
             ],
           },
-        });
+        }); // query db
 
         isPurchased = !!ordersData.docs[0];
       }
@@ -61,7 +70,7 @@ export const productsRouter = createTRPCRouter({
         where: {
           product: { equals: input.id },
         },
-      });
+      }); // query db
 
       const reviewRating =
         reviewsData.docs.length > 0
@@ -122,7 +131,9 @@ export const productsRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const where: Where = {};
+      const where: Where = {
+        isArchived: { not_equals: true }, // omit archived products
+      };
       let sort: Sort = "-createdAt";
 
       // sort filters
@@ -158,6 +169,13 @@ export const productsRouter = createTRPCRouter({
       if (input.tenantSlug) {
         where["tenant.slug"] = {
           equals: input.tenantSlug,
+        };
+      } else {
+        // if we are loading products for pubic storefront (no tenantSlug)
+        // make sure not load products set to "isPrivate: true"
+        // these products are only visible to the tenant store who created them
+        where["isPrivate"] = {
+          not_equals: true, // omit private products
         };
       }
 
