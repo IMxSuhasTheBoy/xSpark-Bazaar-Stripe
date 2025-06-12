@@ -258,7 +258,7 @@ export interface Product {
   cover?: (string | null) | Media;
   refundPolicy?: ('30-day' | '14-day' | '7-day' | '3-day' | '1-day' | 'no-refunds') | null;
   /**
-   * Protected content only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports Markdown formatting.
+   * Protected content only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports rich-text formatting.
    */
   content?: {
     root: {
@@ -280,7 +280,7 @@ export interface Product {
    */
   isPrivate?: boolean | null;
   /**
-   * If checked, this product will be archived and customes will not be able to see or purchase it.
+   * If checked, this product will be archived and customers will not be able to see or purchase it.
    */
   isArchived?: boolean | null;
   updatedAt: string;
