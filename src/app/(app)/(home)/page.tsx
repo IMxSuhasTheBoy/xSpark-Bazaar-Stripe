@@ -19,7 +19,7 @@ const Page = async ({ searchParams }: Props) => {
   const queryClient = getQueryClient();
 
   // prefetch categories data server-side to leverage React Server Components for improved initial load performance
-  await queryClient.prefetchInfiniteQuery(
+  void queryClient.prefetchInfiniteQuery(
     trpc.products.getMany.infiniteQueryOptions({
       ...filters,
       limit: DEFAULT_LIMIT,
