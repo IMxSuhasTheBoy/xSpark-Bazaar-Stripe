@@ -170,19 +170,17 @@ export const ReviewFormSkeleton = () => {
     <div className="flex flex-col gap-y-4">
       <p className="font-medium">Liked it? Give it a rating</p>
 
-      <StarPicker disabled />
+      <div
+        aria-hidden="true"
+        className="bg-muted h-6 w-28 animate-pulse rounded"
+      />
 
       <Textarea placeholder="Want to leave a written review?" disabled />
 
-      <Button
-        type="button"
-        variant="elevated"
-        size="lg"
-        disabled
-        className="hover:text-primary w-fit bg-black text-white hover:bg-amber-400"
-      >
-        Post review
-      </Button>
+      <div
+        aria-hidden="true"
+        className="bg-muted h-10 w-32 animate-pulse rounded"
+      />
     </div>
   );
 };

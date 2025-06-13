@@ -74,7 +74,7 @@ export const Products: CollectionConfig = {
 
       admin: {
         description:
-          "Protected content only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports Markdown formatting.",
+          "Protected content only visible to customers after purchase, Add product documentation, downloadable files, getting started guides and bonus materials. Supports rich-text formatting.",
       },
     },
     {
@@ -94,7 +94,7 @@ export const Products: CollectionConfig = {
       defaultValue: false,
       admin: {
         description:
-          "If checked, this product will be archived and customes will not be able to see or purchase it.",
+          "If checked, this product will be archived and customers will not be able to see or purchase it.",
       },
     },
   ],
