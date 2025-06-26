@@ -171,14 +171,16 @@ export const ReviewFormSkeleton = () => {
       <p className="font-medium">Liked it? Give it a rating</p>
 
       <div
-        aria-hidden="true"
+        role="status"
+        aria-busy="true"
         className="bg-muted h-6 w-28 animate-pulse rounded"
       />
 
       <Textarea placeholder="Want to leave a written review?" disabled />
 
       <div
-        aria-hidden="true"
+        role="status"
+        aria-busy="true"
         className="bg-muted h-10 w-32 animate-pulse rounded"
       />
     </div>
