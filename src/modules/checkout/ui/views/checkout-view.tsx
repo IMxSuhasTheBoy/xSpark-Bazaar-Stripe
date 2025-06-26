@@ -48,7 +48,7 @@ export const CheckoutView = ({ tenantSlug }: CheckoutViewProps) => {
   //   setDialogOpen(false);
   // };
 
-  // Razorpay purchase mutation
+  // purchase mutation
   const purchase = useMutation(
     trpc.checkout.purchase.mutationOptions({
       onMutate: () => {
